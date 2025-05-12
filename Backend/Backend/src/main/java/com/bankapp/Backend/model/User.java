@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "users")
-public class UserModel {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,6 +18,9 @@ public class UserModel {
 
     @Column(name = "last_name", nullable = false)
     private String lastName;
+
+    @Column(name = "user_name", nullable = false)
+    private String userName;
 
     @Column(name = "role", nullable = false)
     private Role role;
@@ -37,12 +40,13 @@ public class UserModel {
     @Column(name = "bsn_number", unique = true)
     private String bsnNumber;
 
-    public UserModel() {}
+    public User() {}
 
-    public UserModel(String firstName, String lastName, Role role, LocalDate dateOfBirth,
+    public User(String firstName, String lastName, String userName, Role role, LocalDate dateOfBirth,
                 String email, String password, String phoneNumber, String bsnNumber) {
         this.firstName = firstName;
         this.lastName = lastName;
+        this.userName = userName;
         this.role = role;
         this.dateOfBirth = dateOfBirth;
         this.email = email;
@@ -58,6 +62,9 @@ public class UserModel {
 
     public String getLastName() { return lastName; }
     public void setLastName(String lastName) { this.lastName = lastName; }
+
+    public String getUserName() { return userName; }
+    public void setUserName(String userName) { this.userName = userName; }
 
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }

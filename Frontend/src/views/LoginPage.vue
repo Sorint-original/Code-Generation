@@ -1,7 +1,7 @@
 <template>
   <div class="login-page d-flex justify-content-center align-items-center vh-100">
     <div class="card p-4 shadow-lg" style="width: 400px;">
-      <h2 class="text-center mb-4">InBanked</h2>
+    <img class="login-logo mx-auto d-block mb-4" src="../assets/img/May 14, 2025, 09_37_41 PM.png" alt="Banking App Logo">
 
       <form @submit.prevent="login">
         <div class="mb-3">
@@ -74,4 +74,9 @@ export default {
 .login-page {
   background: linear-gradient(to right, #93FB9D, #09C7FB);
 }
+.login-logo {
+  max-width: 200px;
+  height: auto;
+}
+
 </style>

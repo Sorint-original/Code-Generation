@@ -1,0 +1,77 @@
+<template>
+  <div class="login-page d-flex justify-content-center align-items-center vh-100">
+    <div class="card p-4 shadow-lg" style="width: 400px;">
+      <h2 class="text-center mb-4">InBanked</h2>
+
+      <form @submit.prevent="login">
+        <div class="mb-3">
+          <label for="email" class="form-label">Email address</label>
+          <input v-model="email" type="email" class="form-control" id="email" required />
+        </div>
+
+        <div class="mb-3">
+          <label for="password" class="form-label">Password</label>
+          <input v-model="password" type="password" class="form-control" id="password" required />
+        </div>
+
+        <button type="submit" class="btn w-100 text-white" style="background: linear-gradient(to right, #93FB9D, #09C7FB);">
+          Login
+        </button>
+
+        <p v-if="errorMessages" class="text-danger mt-2">{{ errorMessages }}</p>
+      </form>
+    </div>
+  </div>
+</template>
+
+<script>
+import api from "@/api/api";
+import { useAuthStore } from "@/stores/authstore";
+import { useRouter } from "vue-router";
+
+export default {
+  name: "LoginPage",
+
+  data() {
+    return {
+      email: "",
+      password: "",
+      errorMessages: "",
+    };
+  },
+
+  created() {
+    this.authStore = useAuthStore();
+    this.router = useRouter();
+  },
+
+  methods: {
+    async login() {
+      try {
+        const response = await api.post("/login", {
+          email: this.email,
+          password: this.password,
+        });
+
+        this.authStore.login(response.data.token);
+        console.log("Login successful:", response.data);
+
+
+      } catch (error) {
+        if (error.response && error.response.status === 401) {
+          this.errorMessages = "Invalid email or password.";
+        } else {
+          this.errorMessages = "An error occurred. Please try again.";
+        }
+        console.error("Login failed:", error);
+      }
+    },
+  },
+};
+</script>
+
+<style scoped>
+.login-page {
+  background: linear-gradient(to right, #93FB9D, #09C7FB);
+}
+</style>

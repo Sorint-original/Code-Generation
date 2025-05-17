@@ -1,10 +1,12 @@
 package com.bankapp.Backend.controller;
 
-import com.bankapp.Backend.dto.TransferRequest;
+import com.bankapp.Backend.DTO.TransferRequest;
 import com.bankapp.Backend.service.TransferService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/transfer")
@@ -23,7 +25,7 @@ public class TransferController {
             transferService.transferFunds(request);
             return ResponseEntity.ok("✅ Transfer successful");
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body("❌ Error: " + e.getMessage());
+            return ResponseEntity.badRequest().body("❌ Error: " + request.getFromAccountId() + " " + request.getToAccountId() + " " + " " + request.getAmount() + e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("⚠️ Unexpected error");
         }

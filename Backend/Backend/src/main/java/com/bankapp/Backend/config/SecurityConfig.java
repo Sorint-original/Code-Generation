@@ -36,6 +36,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/h2-console/**").permitAll() // Allow H2 console
                         .requestMatchers("/login").permitAll()
+                        .requestMatchers("/transfer").permitAll()
+
                         .anyRequest().authenticated()
 
                 )

@@ -17,6 +17,11 @@
         <button type="submit" class="btn w-100 text-white" style="background: linear-gradient(to right, #93FB9D, #09C7FB);">
           Login
         </button>
+        <div class="mt-3 text-center">
+          <span>Don't have an account?</span>
+          <a v-on:click="goToRegister()" class="text-decoration-none ms-1">Sign up</a>
+        </div>
+
 
         <p v-if="errorMessages" class="text-danger mt-2">{{ errorMessages }}</p>
       </form>
@@ -65,6 +70,9 @@ export default {
         }
         console.error("Login failed:", error);
       }
+    },
+    goToRegister() {
+      this.router.push("/register");
     },
   },
 };

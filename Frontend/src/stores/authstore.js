@@ -1,4 +1,3 @@
-// src/stores/authStore.js
 import { defineStore } from 'pinia'
 import { jwtDecode } from 'jwt-decode'
 export const useAuthStore = defineStore('auth', {
@@ -13,11 +12,9 @@ export const useAuthStore = defineStore('auth', {
       this.token = token
       this.isAuthenticated = true
 
-      // Decode token to extract role
       const decoded = jwtDecode(token)
       this.role = decoded.role
 
-      // Save to localStorage
       localStorage.setItem('token', token)
       localStorage.setItem('role', this.role)
     },

@@ -11,19 +11,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
 
     public final UserRepository userRepository;
     public final BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final BankAccountService bankAccountService;
     @Autowired
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, BankAccountService bankAccountService) {
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-        this.bankAccountService = bankAccountService;
     }
 
     public User createUser(User user) {
@@ -43,14 +43,12 @@ public class UserService {
         newUser.setBsnNumber(request.getBsnNumber());
         newUser.setUserName(request.getUserName());
         newUser.setRole(Role.CUSTOMER);
+        newUser.setBankAccounts(new ArrayList<BankAccount>());
 
         try {
             // Validate & save user
             User savedUser = createUser(newUser);
 
-            // Create default account
-            BankAccount account = bankAccountService.createDefaultBankAccount(savedUser);
-            savedUser.setBankAccounts(List.of(account));
 
             return new CustomerRegistrationResponse(
                     savedUser.getEmail(),
@@ -89,4 +87,17 @@ public class UserService {
         }
     }
 
+    public List<User> findUnapprovedUsers(Role role) {
+        List<User> users = userRepository.findAllByRoleAndBankAccountsEmpty(role);
+
+        if (users.isEmpty()) {
+            throw new IllegalStateException("No unapproved users found.");
+        }
+
+        return users;
+    }
+
+    public User findById(Long id) {
+        return userRepository.findById(id).orElse(null);
+    }
 }

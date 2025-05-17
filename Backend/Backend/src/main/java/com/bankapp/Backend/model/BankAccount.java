@@ -42,10 +42,10 @@ public class BankAccount {
         this.dailyTransferLimit = dailyTransferLimit;
         this.status = status;
     }
-    public BankAccount(User user) {
+    public BankAccount(User user, AccountType accountType) {
         this.user = user;
         this.amount = 0.0;
-        this.type = AccountType.CHECKING;
+        this.type = accountType;
         this.iban = null; //i have it not so i can set it later using the iban generator
         this.absoluteTransferLimit = 1000.0;
         this.dailyTransferLimit = 5000.0;

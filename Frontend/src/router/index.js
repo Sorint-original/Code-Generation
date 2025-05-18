@@ -3,11 +3,22 @@ import { useAuthStore } from "../stores//authstore";
 import LoginPage from "../views/LoginPage.vue";
 import RegisterPage from "../views/RegisterPage.vue";
 import TestPage from "../views/Testpage.vue";
+import EmployeeDashboard from "@/views/EmployeeDashboard.vue";
+import UnAuthorizedPage from "@/views/UnAuthorized.vue";
 
 const routes = [
   { path: "/login", component: LoginPage },
   { path: "/register", component: RegisterPage },
   { path: "/test", component: TestPage, meta: { requiresAuth: true } },
+  {
+    path: '/employee',
+    name: 'EmployeeDashboard',
+    component: EmployeeDashboard,
+    meta: { requiresAuth: true, role: 'EMPLOYEE' }
+  },
+    { path: "/unauthorized", component: UnAuthorizedPage },
+
+
 ];
 
 const router = createRouter({
@@ -19,10 +30,15 @@ router.beforeEach((to, from, next) => {
   const authStore = useAuthStore();
 
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-    next({ path: '/login', query: { redirect: to.fullPath } });
-  } else {
-    next();
+    return next({ path: '/login', query: { redirect: to.fullPath } });
   }
+
+  if (to.meta.role && authStore.role !== to.meta.role) {
+    return next('/unauthorized'); 
+  }
+
+  next();
 });
+
 
 export default router;

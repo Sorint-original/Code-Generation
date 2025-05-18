@@ -1,8 +1,12 @@
 package com.bankapp.Backend.service;
 
+import com.bankapp.Backend.model.AccountType;
 import com.bankapp.Backend.model.BankAccount;
+import com.bankapp.Backend.model.Role;
 import com.bankapp.Backend.model.User;
 import com.bankapp.Backend.repository.BankAccountRepository;
+import com.bankapp.Backend.repository.UserRepository;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,6 +25,26 @@ public class BankAccountService {
         bankAccount.setIban(ibanGenerator.generateDutchIBAN());
         return bankAccountRepository.save(bankAccount);
     }
+
+    public void approveCustomer(User user) {
+
+        if (user.getRole() != Role.CUSTOMER) {
+            throw new IllegalArgumentException("Only customers can be approved.");
+        }
+
+        if (!user.getBankAccounts().isEmpty()) {
+            throw new IllegalStateException("Customer already has accounts.");
+        }
+
+
+
+        BankAccount checking = new BankAccount(user, AccountType.CHECKING, ibanGenerator.generateDutchIBAN());
+        BankAccount savings = new BankAccount(user, AccountType.SAVINGS, ibanGenerator.generateDutchIBAN());
+
+        bankAccountRepository.save(checking);
+        bankAccountRepository.save(savings);
+    }
+
 
 
 }

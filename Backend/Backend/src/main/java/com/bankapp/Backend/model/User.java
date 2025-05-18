@@ -3,7 +3,11 @@ package com.bankapp.Backend.model;
 
 
 import jakarta.persistence.*;
-        import java.time.LocalDate;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Entity
 @Table(name = "users")
@@ -39,6 +43,10 @@ public class User {
 
     @Column(name = "bsn_number", unique = true)
     private String bsnNumber;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<BankAccount> bankAccounts = new ArrayList<>();
+
 
     public User() {}
 
@@ -83,5 +91,13 @@ public class User {
 
     public String getBsnNumber() { return bsnNumber; }
     public void setBsnNumber(String bsnNumber) { this.bsnNumber = bsnNumber; }
+
+    public List<BankAccount> getBankAccounts() {
+        return bankAccounts;
+    }
+
+    public void setBankAccounts(List<BankAccount> bankAccounts) {
+        this.bankAccounts = bankAccounts;
+    }
 }
 

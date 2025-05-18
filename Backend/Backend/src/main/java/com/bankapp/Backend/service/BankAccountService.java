@@ -20,11 +20,6 @@ public class BankAccountService {
         this.ibanGenerator = new IBANGenerator();
     }
 
-    public BankAccount createDefaultBankAccount(User user) {
-        BankAccount bankAccount = new BankAccount(user);
-        bankAccount.setIban(ibanGenerator.generateDutchIBAN());
-        return bankAccountRepository.save(bankAccount);
-    }
 
     public void approveCustomer(User user) {
 

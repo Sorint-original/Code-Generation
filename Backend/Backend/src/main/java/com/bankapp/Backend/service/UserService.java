@@ -2,28 +2,30 @@ package com.bankapp.Backend.service;
 
 import com.bankapp.Backend.DTO.CustomerRegistrationRequest;
 import com.bankapp.Backend.DTO.CustomerRegistrationResponse;
+import com.bankapp.Backend.model.AccountType;
 import com.bankapp.Backend.model.BankAccount;
 import com.bankapp.Backend.model.Role;
 import com.bankapp.Backend.model.User;
 import com.bankapp.Backend.repository.BankAccountRepository;
 import com.bankapp.Backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
 
     public final UserRepository userRepository;
     public final BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final BankAccountService bankAccountService;
     @Autowired
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, BankAccountService bankAccountService) {
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-        this.bankAccountService = bankAccountService;
     }
 
     public User createUser(User user) {
@@ -43,14 +45,10 @@ public class UserService {
         newUser.setBsnNumber(request.getBsnNumber());
         newUser.setUserName(request.getUserName());
         newUser.setRole(Role.CUSTOMER);
+        newUser.setBankAccounts(new ArrayList<BankAccount>());
 
         try {
-            // Validate & save user
             User savedUser = createUser(newUser);
-
-            // Create default account
-            BankAccount account = bankAccountService.createDefaultBankAccount(savedUser);
-            savedUser.setBankAccounts(List.of(account));
 
             return new CustomerRegistrationResponse(
                     savedUser.getEmail(),
@@ -88,5 +86,39 @@ public class UserService {
             throw new IllegalArgumentException("BSN number is already in use.");
         }
     }
+
+    public List<User> findUnapprovedUsers(Role role) {
+        List<User> users = userRepository.findAllByRoleAndBankAccountsEmpty(role);
+
+        if (users.isEmpty()) {
+            throw new IllegalStateException("No unapproved users found.");
+        }
+
+        return users;
+    }
+
+    public User findById(Long id) {
+        return userRepository.findById(id).orElse(null);
+    }
+  
+    public void approveCustomer(User user) {
+        User customer = userRepository.findById(user.getId())
+                .orElseThrow(() -> new ChangeSetPersister.NotFoundException("User not found"));
+
+        if (customer.getRole() != Role.CUSTOMER) {
+            throw new IllegalArgumentException("Only customers can be approved.");
+        }
+
+        if (!customer.getBankAccounts().isEmpty()) {
+            throw new IllegalStateException("Customer already has accounts.");
+        }
+
+        BankAccount checking = new BankAccount(customer, AccountType.CHECKING, ibanGenerator.generateDutchIBAN());
+        BankAccount savings = new BankAccount(customer, AccountType.SAVINGS, ibanGenerator.generateDutchIBAN());
+
+        bankAccountRepository.save(checking);
+        bankAccountRepository.save(savings);
+    }
+
 
 }

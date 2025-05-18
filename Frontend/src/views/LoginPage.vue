@@ -60,6 +60,14 @@ export default {
 
         this.authStore.login(response.data.token);
         console.log("Login successful:", response.data);
+        const role = this.authStore.role;
+
+        
+        if (role === 'EMPLOYEE') {
+          this.router.push('/employee');
+        } else {
+          this.router.push('/');
+        }
 
 
       } catch (error) {

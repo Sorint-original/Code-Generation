@@ -1,34 +1,41 @@
-package com.bankapp.Backend.dto;
-
-import java.math.BigDecimal;
+package com.bankapp.Backend.DTO;
 
 public class TransferRequest {
 
-    private long FromAccountId;
-    private long ToAccountId;
-    private BigDecimal Amount;
+    private long fromAccountId;
+    private long toAccountId;
+    private double amount;
 
-    public TransferRequest(long fromAccountId, long toAccountId, BigDecimal amount) {
-        FromAccountId = fromAccountId;
-        ToAccountId = toAccountId;
-        Amount = amount;
+    public TransferRequest() {
     }
+
+    public TransferRequest(long fromAccountId, long toAccountId, double amount) {
+        this.fromAccountId = fromAccountId;
+        this.toAccountId = toAccountId;
+        this.amount = amount;
+    }
+
     public long getFromAccountId() {
-        return FromAccountId;
+        return fromAccountId;
     }
+
     public void setFromAccountId(long fromAccountId) {
-        FromAccountId = fromAccountId;
+        this.fromAccountId = fromAccountId;
     }
+
     public long getToAccountId() {
-        return ToAccountId;
+        return toAccountId;
     }
+
     public void setToAccountId(long toAccountId) {
-        ToAccountId = toAccountId;
+        this.toAccountId = toAccountId;
     }
-    public BigDecimal getAmount() {
-        return Amount;
+
+    public double getAmount() {
+        return amount;
     }
-    public void setAmount(BigDecimal amount) {
-        Amount = amount;
+
+    public void setAmount(double amount) {
+        this.amount = amount;
     }
 }

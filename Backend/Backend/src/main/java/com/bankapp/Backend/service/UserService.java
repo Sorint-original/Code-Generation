@@ -88,37 +88,14 @@ public class UserService {
     }
 
     public List<User> findUnapprovedUsers(Role role) {
-        List<User> users = userRepository.findAllByRoleAndBankAccountsEmpty(role);
-
-        if (users.isEmpty()) {
-            throw new IllegalStateException("No unapproved users found.");
-        }
-
-        return users;
+        return userRepository.findAllByRoleAndBankAccountsEmpty(role);
     }
 
     public User findById(Long id) {
         return userRepository.findById(id).orElse(null);
     }
   
-    public void approveCustomer(User user) {
-        User customer = userRepository.findById(user.getId())
-                .orElseThrow(() -> new ChangeSetPersister.NotFoundException("User not found"));
 
-        if (customer.getRole() != Role.CUSTOMER) {
-            throw new IllegalArgumentException("Only customers can be approved.");
-        }
-
-        if (!customer.getBankAccounts().isEmpty()) {
-            throw new IllegalStateException("Customer already has accounts.");
-        }
-
-        BankAccount checking = new BankAccount(customer, AccountType.CHECKING, ibanGenerator.generateDutchIBAN());
-        BankAccount savings = new BankAccount(customer, AccountType.SAVINGS, ibanGenerator.generateDutchIBAN());
-
-        bankAccountRepository.save(checking);
-        bankAccountRepository.save(savings);
-    }
 
 
 }

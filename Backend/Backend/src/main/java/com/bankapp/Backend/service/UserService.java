@@ -88,20 +88,14 @@ public class UserService {
     }
 
     public List<User> findUnapprovedUsers(Role role) {
-        List<User> users = userRepository.findAllByRoleAndBankAccountsEmpty(role);
-
-        if (users.isEmpty()) {
-            throw new IllegalStateException("No unapproved users found.");
-        }
-
-        return users;
+        return userRepository.findAllByRoleAndBankAccountsEmpty(role);
     }
 
     public User findById(Long id) {
         return userRepository.findById(id).orElse(null);
     }
   
-    
+
 
 
 }

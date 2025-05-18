@@ -101,24 +101,7 @@ public class UserService {
         return userRepository.findById(id).orElse(null);
     }
   
-    public void approveCustomer(User user) {
-        User customer = userRepository.findById(user.getId())
-                .orElseThrow(() -> new ChangeSetPersister.NotFoundException("User not found"));
-
-        if (customer.getRole() != Role.CUSTOMER) {
-            throw new IllegalArgumentException("Only customers can be approved.");
-        }
-
-        if (!customer.getBankAccounts().isEmpty()) {
-            throw new IllegalStateException("Customer already has accounts.");
-        }
-
-        BankAccount checking = new BankAccount(customer, AccountType.CHECKING, ibanGenerator.generateDutchIBAN());
-        BankAccount savings = new BankAccount(customer, AccountType.SAVINGS, ibanGenerator.generateDutchIBAN());
-
-        bankAccountRepository.save(checking);
-        bankAccountRepository.save(savings);
-    }
+    
 
 
 }

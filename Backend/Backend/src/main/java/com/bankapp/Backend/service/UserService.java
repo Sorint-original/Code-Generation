@@ -2,10 +2,7 @@ package com.bankapp.Backend.service;
 
 import com.bankapp.Backend.DTO.CustomerRegistrationRequest;
 import com.bankapp.Backend.DTO.CustomerRegistrationResponse;
-import com.bankapp.Backend.model.AccountType;
-import com.bankapp.Backend.model.BankAccount;
-import com.bankapp.Backend.model.Role;
-import com.bankapp.Backend.model.User;
+import com.bankapp.Backend.model.*;
 import com.bankapp.Backend.repository.BankAccountRepository;
 import com.bankapp.Backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +32,6 @@ public class UserService {
     }
 
     public CustomerRegistrationResponse registerCustomer(CustomerRegistrationRequest request) {
-        // Map request to User
         User newUser = new User();
         newUser.setFirstName(request.getFirstName());
         newUser.setLastName(request.getLastName());
@@ -46,27 +42,25 @@ public class UserService {
         newUser.setUserName(request.getUserName());
         newUser.setRole(Role.CUSTOMER);
         newUser.setBankAccounts(new ArrayList<BankAccount>());
+        newUser.setStatus(CustomerStatus.Pending);
 
         try {
             User savedUser = createUser(newUser);
 
             return new CustomerRegistrationResponse(
-                    savedUser.getEmail(),
-                    savedUser.getUserName(),
+                    savedUser,
                     true,
                     "Registration successful. Your account is pending approval."
             );
         } catch (IllegalArgumentException e) {
             return new CustomerRegistrationResponse(
-                    request.getEmail(),
-                    request.getUserName(),
+                    newUser,
                     false,
                     e.getMessage()
             );
         } catch (Exception e) {
             return new CustomerRegistrationResponse(
-                    request.getEmail(),
-                    request.getUserName(),
+                    newUser,
                     false,
                     "An unexpected error occurred. Please try again later."
             );
@@ -88,7 +82,7 @@ public class UserService {
     }
 
     public List<User> findUnapprovedUsers(Role role) {
-        return userRepository.findAllByRoleAndBankAccountsEmpty(role);
+        return userRepository.findAllByRoleAndStatus(role, CustomerStatus.Pending);
     }
 
     public User findById(Long id) {

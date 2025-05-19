@@ -39,6 +39,8 @@ public class SecurityConfig {
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/login").permitAll()
                         .requestMatchers("/user/register").permitAll()
+                        .requestMatchers("/employee/**").permitAll()
+
                         .anyRequest().authenticated()
 
                 )

@@ -41,6 +41,7 @@
                 <td>{{ customer.bsnNumber }}</td>
                 <td>
                   <button class="btn btn-success btn-sm" @click="approveCustomer(customer.id)">Approve</button>
+                  <button class="btn btn-danger btn-sm" @click="unapproveCustomer(customer.id)">Decline</button>
                 </td>
               </tr>
             </tbody>
@@ -93,7 +94,18 @@ export default {
       } catch (err) {
         this.errorMessage = 'Failed to approve customer.';
       }
+    },
+
+    async unapproveCustomer(id) {
+      try {
+        await api.post(`/employee/customers/${id}/decline`);
+        this.successMessage = 'Customer unapproved.';
+        this.customers = this.customers.filter(c => c.id !== id);
+      } catch (err) {
+        this.errorMessage = 'Failed to unapprove customer.';
+      }
     }
+
   },
   mounted() {
     this.fetchUnapprovedCustomers();

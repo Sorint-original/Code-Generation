@@ -1,29 +1,35 @@
 package com.bankapp.Backend.config;
 
-import com.bankapp.Backend.model.Account;
-import com.bankapp.Backend.model.Role;
-import com.bankapp.Backend.model.User;
-import com.bankapp.Backend.repository.AccountRepository;
+import com.bankapp.Backend.model.*;
+import com.bankapp.Backend.repository.BankAccountRepository;
 import com.bankapp.Backend.repository.UserRepository;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.query.FluentQuery;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 
 @Component
 public class DataSeeder implements ApplicationRunner {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final AccountRepository accountRepository;
+    private final BankAccountRepository bankAccountRepository;
 
-    public DataSeeder(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, AccountRepository accountRepository) {
+    public DataSeeder(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, BankAccountRepository bankAccountRepository) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-        this.accountRepository = accountRepository;
+        this.bankAccountRepository = bankAccountRepository;
     }
 
 
@@ -62,12 +68,11 @@ public class DataSeeder implements ApplicationRunner {
                     new BigDecimal("987654321.123456789");
 
 
-            Account account = new Account(user1, "21345643211", 1000, "Checking", 1000, 10000, "active");
-            Account account2 = new Account(user2, "2134564321", 1000, "Checking", 1000, 10000, "active");
+            BankAccount bankAccount1 = new BankAccount(user1, new BigDecimal("10000.00"), AccountType.CHECKING, "21345643211", new BigDecimal("0.01"), new BigDecimal("1000.00"), AccountStatus.APPROVED);
+            BankAccount bankAccount2 = new BankAccount(user2, new BigDecimal("10000.00"), AccountType.CHECKING, "2134564321", new BigDecimal("0.01"), new BigDecimal("1000.00"), AccountStatus.APPROVED);
 
-            accountRepository.save(account);
-            accountRepository.save(account2);
-
+            bankAccountRepository.save(bankAccount1);
+            bankAccountRepository.save(bankAccount2);
 
             System.out.println("Seeded test users!");
         }

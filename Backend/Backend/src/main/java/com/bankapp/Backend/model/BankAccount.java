@@ -1,6 +1,8 @@
 package com.bankapp.Backend.model;
 
 import jakarta.persistence.*;
+
+import java.math.BigDecimal;
 import java.util.*;
 
 @Entity
@@ -14,7 +16,7 @@ public class BankAccount {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private double amount = 0.0;
+    private BigDecimal amount = BigDecimal.ZERO.setScale(2);
 
     @Enumerated(EnumType.STRING)
     private AccountType type;
@@ -22,9 +24,9 @@ public class BankAccount {
     @Column(unique = true, nullable = false)
     private String iban;
 
-    private double absoluteTransferLimit;
+    private BigDecimal absoluteTransferLimit;
 
-    private double dailyTransferLimit;
+    private BigDecimal dailyTransferLimit;
 
     @Enumerated(EnumType.STRING)
     private AccountStatus status;
@@ -32,8 +34,8 @@ public class BankAccount {
     public BankAccount() {
     }
 
-    public BankAccount(User user, double amount, AccountType type, String iban,
-                       double absoluteTransferLimit, double dailyTransferLimit, AccountStatus status) {
+    public BankAccount(User user, BigDecimal amount, AccountType type, String iban,
+                       BigDecimal absoluteTransferLimit, BigDecimal dailyTransferLimit, AccountStatus status) {
         this.user = user;
         this.amount = amount;
         this.type = type;
@@ -44,12 +46,12 @@ public class BankAccount {
     }
     public BankAccount(User user, AccountType accountType, String iban) {
         this.user = user;
-        this.amount = 0.0;
+        this.amount = BigDecimal.ZERO.setScale(2);
         this.type = accountType;
         this.iban = iban; //i have it not so i can set it later using the iban generator
-        this.absoluteTransferLimit = 1000.0;
-        this.dailyTransferLimit = 5000.0;
-        this.status = AccountStatus.APPROVED;
+        this.absoluteTransferLimit = new BigDecimal("0.01");
+        this.dailyTransferLimit = new BigDecimal("1000.00");
+        this.status = AccountStatus.UNAPPROVED;
     }
 
 
@@ -66,11 +68,11 @@ public class BankAccount {
         this.user = user;
     }
 
-    public double getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(double amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 
@@ -90,19 +92,19 @@ public class BankAccount {
         this.iban = iban;
     }
 
-    public double getAbsoluteTransferLimit() {
+    public BigDecimal getAbsoluteTransferLimit() {
         return absoluteTransferLimit;
     }
 
-    public void setAbsoluteTransferLimit(double absoluteTransferLimit) {
+    public void setAbsoluteTransferLimit(BigDecimal absoluteTransferLimit) {
         this.absoluteTransferLimit = absoluteTransferLimit;
     }
 
-    public double getDailyTransferLimit() {
+    public BigDecimal getDailyTransferLimit() {
         return dailyTransferLimit;
     }
 
-    public void setDailyTransferLimit(double dailyTransferLimit) {
+    public void setDailyTransferLimit(BigDecimal dailyTransferLimit) {
         this.dailyTransferLimit = dailyTransferLimit;
     }
 
@@ -113,4 +115,6 @@ public class BankAccount {
     public void setStatus(AccountStatus status) {
         this.status = status;
     }
+
+
 }

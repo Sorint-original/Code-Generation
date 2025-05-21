@@ -9,6 +9,8 @@ import com.bankapp.Backend.repository.UserRepository;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+
 @Service
 public class BankAccountService {
 
@@ -39,7 +41,7 @@ public class BankAccountService {
         bankAccountRepository.save(checking);
         bankAccountRepository.save(savings);
     }
-
-
-
+    public void changeDailyLimit(String iban, BigDecimal newLimit) {
+        bankAccountRepository.updateDailyLimitByIban(iban, newLimit);
+    }
 }

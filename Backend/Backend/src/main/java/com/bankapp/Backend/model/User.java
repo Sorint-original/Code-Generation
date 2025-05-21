@@ -62,7 +62,9 @@ public class User {
         this.phoneNumber = phoneNumber;
         this.bsnNumber = bsnNumber;
     }
-
+    public boolean isEmployee() {
+        return role == Role.EMPLOYEE;
+    }
     public long getId() { return id; }
 
     public String getFirstName() { return firstName; }

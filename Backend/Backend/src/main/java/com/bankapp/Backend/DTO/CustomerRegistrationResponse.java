@@ -1,28 +1,31 @@
 package com.bankapp.Backend.DTO;
 
+import com.bankapp.Backend.model.User;
+
 public class CustomerRegistrationResponse {
 
-    private String email;
-    private String username;
+    private User user;
     private boolean success;
     private String message;
 
     public CustomerRegistrationResponse() {}
 
-    public CustomerRegistrationResponse(String email, String username, boolean success, String message) {
-        this.email = email;
-        this.username = username;
+    public CustomerRegistrationResponse(User user, boolean success, String message) {
+        this.user = user;
         this.success = success;
         this.message = message;
     }
 
     // Getters and setters
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
 
-    public String getFullName() { return username; }
-    public void setFullName(String fullName) { this.username = fullName; }
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 
     public boolean isSuccess() { return success; }
     public void setSuccess(boolean success) { this.success = success; }

@@ -31,22 +31,23 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors()
-                .and()
                 .csrf(csrf -> csrf.disable()) // Disable CSRF for H2 Console
                 .headers(headers -> headers.frameOptions().disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/h2-console/**").permitAll()
+                        .requestMatchers("/h2-console/**").permitAll() // Allow H2 console
                         .requestMatchers("/login").permitAll()
                         .requestMatchers("/user/register").permitAll()
                         .requestMatchers("/employee/**").permitAll()
+                        .requestMatchers("/transaction").permitAll()
 
                         .anyRequest().authenticated()
 
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                );
+                )
+                .userDetailsService(userDetailsService)
+        ;
 
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

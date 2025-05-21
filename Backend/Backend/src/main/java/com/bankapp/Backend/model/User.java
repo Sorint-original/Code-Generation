@@ -44,6 +44,11 @@ public class User {
     @Column(name = "bsn_number", unique = true)
     private String bsnNumber;
 
+    @Enumerated(EnumType.STRING)
+
+    @Column(name = "status")
+    private CustomerStatus status;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<BankAccount> bankAccounts = new ArrayList<>();
 
@@ -51,7 +56,7 @@ public class User {
     public User() {}
 
     public User(String firstName, String lastName, String userName, Role role, LocalDate dateOfBirth,
-                String email, String password, String phoneNumber, String bsnNumber) {
+                String email, String password, String phoneNumber, String bsnNumber, CustomerStatus status) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.userName = userName;
@@ -61,6 +66,7 @@ public class User {
         this.password = password;
         this.phoneNumber = phoneNumber;
         this.bsnNumber = bsnNumber;
+        this.status = status;
     }
 
     public long getId() { return id; }
@@ -98,6 +104,14 @@ public class User {
 
     public void setBankAccounts(List<BankAccount> bankAccounts) {
         this.bankAccounts = bankAccounts;
+    }
+
+    public CustomerStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(CustomerStatus status) {
+        this.status = status;
     }
 }
 

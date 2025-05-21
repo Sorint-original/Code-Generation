@@ -49,7 +49,7 @@ public class BankAccount {
         this.iban = iban; //i have it not so i can set it later using the iban generator
         this.absoluteTransferLimit = 1000.0;
         this.dailyTransferLimit = 5000.0;
-        this.status = AccountStatus.UNAPPROVED;
+        this.status = AccountStatus.APPROVED;
     }
 
 

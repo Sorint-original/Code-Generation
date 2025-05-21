@@ -36,7 +36,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/h2-console/**").permitAll() // Allow H2 console
                         .requestMatchers("/login").permitAll()
-                        .requestMatchers("/transfer").permitAll()
+                        .requestMatchers("/user/register").permitAll()
+                        .requestMatchers("/employee/**").permitAll()
+                        .requestMatchers("/transaction").permitAll()
 
                         .anyRequest().authenticated()
 
@@ -60,5 +62,5 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
-
+    
 }

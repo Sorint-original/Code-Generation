@@ -117,4 +117,7 @@ public class BankAccount {
     }
 
 
+    public AccountType getAccountType() {
+        return type;
+    }
 }

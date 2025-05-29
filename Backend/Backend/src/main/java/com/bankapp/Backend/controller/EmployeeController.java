@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/employee")
+@RequestMapping("/api/employee")
 @PreAuthorize("hasRole('EMPLOYEE')")
 public class EmployeeController {
 

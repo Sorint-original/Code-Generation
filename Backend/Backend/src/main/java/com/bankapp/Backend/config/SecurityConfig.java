@@ -38,8 +38,14 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
-                        .requestMatchers("/login").permitAll()
-                        .requestMatchers("/transfer").permitAll()
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/swagger-ui.html").permitAll()
+                        .requestMatchers("/v3/api-docs/**").permitAll()
+
+                        .requestMatchers("/api/login").permitAll()
+                        .requestMatchers("/api/user/register").permitAll()
+
+                        .requestMatchers("/api/transfer").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

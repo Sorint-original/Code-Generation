@@ -115,5 +115,6 @@ public class User {
     public void setStatus(CustomerStatus status) {
         this.status = status;
     }
+    public void setId(long id) { this.id = id; }
 }
 

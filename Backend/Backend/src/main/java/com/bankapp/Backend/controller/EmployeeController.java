@@ -33,6 +33,18 @@ public class EmployeeController {
         return ResponseEntity.ok(userService.findUnapprovedUsers(Role.CUSTOMER));
     }
 
+    @GetMapping("/user/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable Long id) {
+        User user = userService.findById(id);
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+        }
+
+        return ResponseEntity.ok(user);
+    }
+
+
     @PostMapping("/customers/{id}/approve")
     public ResponseEntity<?> approveCustomer(@PathVariable Long id) {
         User user = userService.findById(id);

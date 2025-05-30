@@ -2,6 +2,7 @@ package com.bankapp.Backend.model;
 
 
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -50,6 +51,7 @@ public class User {
     private CustomerStatus status;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<BankAccount> bankAccounts = new ArrayList<>();
 
 

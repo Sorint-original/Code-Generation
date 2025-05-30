@@ -47,6 +47,7 @@ public class DataSeeder implements ApplicationRunner {
             user1.setPhoneNumber("0612345678");
             user1.setDateOfBirth(LocalDate.parse("1990-01-01"));
             user1.setBsnNumber("123456789");
+            user1.setStatus(CustomerStatus.Pending);
 
             User user2 = new User();
             user2.setFirstName("Bob");
@@ -59,8 +60,36 @@ public class DataSeeder implements ApplicationRunner {
             user2.setDateOfBirth(LocalDate.parse("1985-05-15"));
             user2.setBsnNumber("987654321");
 
+            User user3 = new User();
+            user3.setFirstName("Jane");
+            user3.setLastName("Smith");
+            user3.setUserName("JaneSmith");
+            user3.setEmail("jane@example.com");
+            user3.setPassword(bCryptPasswordEncoder.encode("secureaccess"));
+            user3.setRole(Role.CUSTOMER);
+            user3.setPhoneNumber("062344356789");
+            user3.setDateOfBirth(LocalDate.parse("1985-05-15"));
+            user3.setBsnNumber("987689080954321");
+            user3.setStatus(CustomerStatus.Pending);
+
+            User user4 = new User();
+            user4.setFirstName("zozo");
+            user4.setLastName("Smith");
+            user4.setUserName("zozoSmith");
+            user4.setEmail("zozo@example.com");
+            user4.setPassword(bCryptPasswordEncoder.encode("secureaccess"));
+            user4.setRole(Role.CUSTOMER);
+            user4.setPhoneNumber("06234589078096789");
+            user4.setDateOfBirth(LocalDate.parse("1985-05-15"));
+            user4.setBsnNumber("987654389080921");
+            user4.setStatus(CustomerStatus.Pending);
+
+
+
             userRepository.save(user1);
             userRepository.save(user2);
+            userRepository.save(user3);
+            userRepository.save(user4);
 
             BigDecimal bd1 =
                     new BigDecimal("124567890.0987654321");
@@ -68,7 +97,7 @@ public class DataSeeder implements ApplicationRunner {
                     new BigDecimal("987654321.123456789");
 
 
-            BankAccount bankAccount1 = new BankAccount(user1, new BigDecimal("10000.00"), AccountType.CHECKING, "21345643211", new BigDecimal("0.01"), new BigDecimal("1000.00"), AccountStatus.APPROVED);
+            BankAccount bankAccount1 = new BankAccount(user2, new BigDecimal("10000.00"), AccountType.CHECKING, "21345643211", new BigDecimal("0.01"), new BigDecimal("1000.00"), AccountStatus.APPROVED);
             BankAccount bankAccount2 = new BankAccount(user2, new BigDecimal("10000.00"), AccountType.CHECKING, "2134564321", new BigDecimal("0.01"), new BigDecimal("1000.00"), AccountStatus.APPROVED);
 
             bankAccountRepository.save(bankAccount1);

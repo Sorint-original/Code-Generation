@@ -8,11 +8,16 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
     @Query("SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t WHERE t.fromAccount = :account AND t.date >= CURRENT_DATE")
     BigDecimal getTotalTransferredToday(@Param("account") BankAccount account);
+
+    // Query to get all transactions (optionally with sorting)
+    @Query("SELECT t FROM Transaction t ORDER BY t.date DESC")
+    List<Transaction> findAllTransactions();
 
 }

@@ -2,9 +2,11 @@ package com.bankapp.Backend.controller;
 
 import com.bankapp.Backend.model.CustomerStatus;
 import com.bankapp.Backend.model.Role;
+import com.bankapp.Backend.model.Transaction;
 import com.bankapp.Backend.model.User;
 import com.bankapp.Backend.service.BankAccountService;
 import com.bankapp.Backend.service.EmployeeService;
+import com.bankapp.Backend.service.TransactionService;
 import com.bankapp.Backend.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,11 +23,13 @@ public class EmployeeController {
 
     private final UserService userService;
     private final EmployeeService employeeService;
+    private final TransactionService transactionService;
 
 
-    public EmployeeController(UserService userService, EmployeeService employeeService) {
+    public EmployeeController(UserService userService, EmployeeService employeeService, TransactionService transactionService) {
         this.userService = userService;
         this.employeeService = employeeService;
+        this.transactionService = transactionService;
     }
 
     @GetMapping("/unapproved-customers")
@@ -64,5 +68,12 @@ public class EmployeeController {
         employeeService.updateUserStatus(user, CustomerStatus.Denied);
         return ResponseEntity.ok("User status updated to " + CustomerStatus.Denied);
     }
+
+    // Code for the employee transaction record
+    @GetMapping("/transaction-history")
+    public ResponseEntity<List<Transaction>> getTransactionHistory() {
+        return ResponseEntity.ok(this.transactionService.fetchTransactionHistory());
+    }
+
 
 }

@@ -11,6 +11,11 @@
             </button>
           </li>
           <!-- Add more nav items here later -->
+          <li class="nav-item mb-2">
+            <button class="btn w-100" :class="{ 'btn-primary': activePage === 'transactionhistory' }" @click="activePage = 'transactionhistory'">
+              Transactions
+            </button>
+          </li>
         </ul>
       </div>
 
@@ -50,6 +55,43 @@
           <p v-if="!loading && customers.length === 0">No unapproved customers.</p>
         </div>
 
+        <div v-if="activePage === 'transactionhistory'">
+          <h3>Transaction History</h3>
+
+          <div v-if="loading" class="alert alert-info">Loading transactions...</div>
+          <div v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+          <div v-if="successMessage" class="alert alert-success">{{ successMessage }}</div>
+
+          <table v-if="transactions.length" class="table table-hover mt-3">
+            <thead class="table-light">
+            <tr>
+              <th>Timestamp</th>
+              <th>From Account</th>
+              <th>To Account</th>
+              <th>Amount</th>
+              <th>Initiated By</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="transaction in transactions" :key="transaction.id">
+              <td>{{ formatDate(transaction.date) }}</td>
+              <td>{{ transaction.fromAccount }}</td>
+              <td>{{ transaction.toAccount }}</td>
+              <td :class="{'text-danger': transaction.amount < 0, 'text-success': transaction.amount > 0}">
+                {{ formatCurrency(transaction.amount) }}
+              </td>
+              <td>
+                {{ transaction.initiatingUser.name }}
+                <span class="badge" :class="transaction.initiatingUser.role === 'EMPLOYEE' ? 'bg-info' : 'bg-secondary'">
+              {{ transaction.initiatedBy.role }}
+            </span>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+          <p v-if="!loading && transactions.length === 0">No transactions found.</p>
+
+        </div>
         <!-- Placeholder for future pages -->
         <div v-else>
           <p>Select a section from the sidebar.</p>
@@ -68,6 +110,7 @@ export default {
     return {
       activePage: 'unapproved',
       customers: [],
+      transactions: [],
       loading: false,
       errorMessage: '',
       successMessage: ''
@@ -104,11 +147,24 @@ export default {
       } catch (err) {
         this.errorMessage = 'Failed to unapprove customer.';
       }
-    }
+    },
 
+    async fetchTransactions() {
+      this.loading = true;
+      this.errorMessage = '';
+      try {
+        const response = await api.get('/employee/transaction-history');
+        this.transactions = response.data;
+      } catch (err) {
+        this.errorMessage = 'Failed to load transactions.';
+      } finally {
+        this.loading = false;
+      }
+    },
   },
   mounted() {
     this.fetchUnapprovedCustomers();
+    this.fetchTransactions();
   }
 };
 </script>

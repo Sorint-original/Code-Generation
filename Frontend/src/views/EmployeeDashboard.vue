@@ -75,15 +75,15 @@
             <tbody>
             <tr v-for="transaction in transactions" :key="transaction.id">
               <td>{{ formatDate(transaction.date) }}</td>
-              <td>{{ transaction.fromAccount }}</td>
-              <td>{{ transaction.toAccount }}</td>
+              <td>{{ transaction.fromAccount.iban }}</td>
+              <td>{{ transaction.toAccount.iban }}</td>
               <td :class="{'text-danger': transaction.amount < 0, 'text-success': transaction.amount > 0}">
                 {{ formatCurrency(transaction.amount) }}
               </td>
               <td>
-                {{ transaction.initiatingUser.name }}
+                {{ transaction.initiatingUser.userName }}
                 <span class="badge" :class="transaction.initiatingUser.role === 'EMPLOYEE' ? 'bg-info' : 'bg-secondary'">
-              {{ transaction.initiatedBy.role }}
+              {{ transaction.initiatingUser.role }}
             </span>
               </td>
             </tr>
@@ -161,6 +161,15 @@ export default {
         this.loading = false;
       }
     },
+    formatDate(timestamp) {
+      return new Date(timestamp).toLocaleString();
+    },
+    formatCurrency(amount) {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'EUR'
+      }).format(amount);
+    }
   },
   mounted() {
     this.fetchUnapprovedCustomers();

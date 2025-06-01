@@ -1,15 +1,13 @@
 package com.bankapp.Backend.service;
 
-import com.bankapp.Backend.model.AccountType;
-import com.bankapp.Backend.model.BankAccount;
-import com.bankapp.Backend.model.Role;
-import com.bankapp.Backend.model.User;
+import com.bankapp.Backend.model.*;
 import com.bankapp.Backend.repository.BankAccountRepository;
 import com.bankapp.Backend.repository.UserRepository;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 public class BankAccountService {
@@ -43,5 +41,17 @@ public class BankAccountService {
     }
     public void changeDailyLimit(String iban, BigDecimal newLimit) {
         bankAccountRepository.updateDailyLimitByIban(iban, newLimit);
+    }
+
+    public List<BankAccount> getAllBankAccounts() {
+        return bankAccountRepository.findAllBankAccounts();
+    }
+
+    public List<BankAccount> getBankAccountsByUserId(Long userId) {
+        return bankAccountRepository.findBankAccountsByUserId(userId);
+    }
+
+    public void updateAccountStatus(String iban, AccountStatus status) {
+        bankAccountRepository.updateStatusByIban(iban, status);
     }
 }

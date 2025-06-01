@@ -6,6 +6,8 @@ import TransferForm from '../views/TransactionForm.vue'
 import TestPage from "../views/Testpage.vue";
 import EmployeeDashboard from "@/views/EmployeeDashboard.vue";
 import UnAuthorizedPage from "@/views/UnAuthorized.vue";
+import AccountInfoPage from "@/views/AccountInfoPage.vue";
+import AllAccountsPage from "@/views/AllAccountsPage.vue";
 
 const routes = [
   { path: "/login", component: LoginPage },
@@ -19,7 +21,8 @@ const routes = [
     meta: { requiresAuth: true, role: 'EMPLOYEE' }
   },
     { path: "/unauthorized", component: UnAuthorizedPage },
-
+    { path: "/account", component: AccountInfoPage },
+    { path: "/account/all", component: AllAccountsPage },
 
 ];
 

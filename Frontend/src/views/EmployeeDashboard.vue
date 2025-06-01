@@ -9,6 +9,12 @@
             <button class="btn w-100" :class="{ 'btn-primary': activePage === 'unapproved' }" @click="activePage = 'unapproved'">
               Approve Customers
             </button>
+            <router-link to="/account/all" class="btn w-100 btn-primary">
+              View All Accounts
+            </router-link>
+            <router-link to="/account" class="btn w-100 btn-primary">
+              My Accounts
+            </router-link>
           </li>
           <!-- Add more nav items here later -->
         </ul>

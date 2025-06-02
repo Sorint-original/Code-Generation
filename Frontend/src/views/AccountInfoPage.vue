@@ -71,7 +71,7 @@ const totalBalance = computed(() => {
 
 onMounted(async () => {
   try {
-    const response = await api.get(`/account/info/${userId}`)
+    const response = await api.get(`/account/info`)
     accountInfo.value = response.data
   } catch (err) {
     error.value = 'Failed to load account information.'

@@ -3,7 +3,10 @@ package com.bankapp.Backend.service;
 import com.bankapp.Backend.model.*;
 import com.bankapp.Backend.repository.BankAccountRepository;
 import com.bankapp.Backend.repository.UserRepository;
+import com.bankapp.Backend.security.MyUserDetails;
 import org.springframework.data.crossstore.ChangeSetPersister;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -53,5 +56,16 @@ public class BankAccountService {
 
     public void updateAccountStatus(String iban, AccountStatus status) {
         bankAccountRepository.updateStatusByIban(iban, status);
+    }
+
+    public Long getCurrentUserId() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth != null && auth.isAuthenticated()) {
+            MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
+            return userDetails.getUserId();
+        }
+
+        throw new RuntimeException("Unauthorized");
     }
 }

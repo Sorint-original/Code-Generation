@@ -4,13 +4,15 @@ import LoginPage from "../views/LoginPage.vue";
 import RegisterPage from "../views/RegisterPage.vue";
 import TransferForm from '../views/TransactionForm.vue'
 import TestPage from "../views/Testpage.vue";
+import TransactionHistory from "../views/CustomerTransactions.vue";
 import EmployeeDashboard from "@/views/EmployeeDashboard.vue";
 import UnAuthorizedPage from "@/views/UnAuthorized.vue";
 
 const routes = [
   { path: "/login", component: LoginPage },
   { path: "/register", component: RegisterPage },
-  { path: '/transaction', component: TransferForm, meta: {requiresAuth: true} }, 
+  { path: '/transaction', component: TransferForm, meta: {requiresAuth: true} },
+  { path: "/transaction-history", component: TransactionHistory, meta: { requiresAuth: true } },
   { path: "/test", component: TestPage, meta: { requiresAuth: true } },
   {
     path: '/employee',

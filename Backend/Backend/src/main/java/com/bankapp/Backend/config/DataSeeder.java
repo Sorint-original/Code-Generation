@@ -2,6 +2,7 @@ package com.bankapp.Backend.config;
 
 import com.bankapp.Backend.model.*;
 import com.bankapp.Backend.repository.BankAccountRepository;
+import com.bankapp.Backend.repository.TransactionRepository;
 import com.bankapp.Backend.repository.UserRepository;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -13,6 +14,7 @@ import org.springframework.data.repository.query.FluentQuery;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -25,11 +27,13 @@ public class DataSeeder implements ApplicationRunner {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final BankAccountRepository bankAccountRepository;
+    private final TransactionRepository transactionRepository;
 
-    public DataSeeder(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, BankAccountRepository bankAccountRepository) {
+    public DataSeeder(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, BankAccountRepository bankAccountRepository, TransactionRepository transactionRepository) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.bankAccountRepository = bankAccountRepository;
+        this.transactionRepository = transactionRepository;
     }
 
 
@@ -102,6 +106,28 @@ public class DataSeeder implements ApplicationRunner {
 
             bankAccountRepository.save(bankAccount1);
             bankAccountRepository.save(bankAccount2);
+
+            // Create test transactions
+            Transaction t1 = new Transaction(bankAccount1, bankAccount2, new BigDecimal("500.00"), bankAccount1.getUser());
+            t1.setDate(LocalDateTime.of(2024, 12, 13, 21, 45));
+
+            Transaction t2 = new Transaction(bankAccount2, bankAccount1, new BigDecimal("250.00"), bankAccount2.getUser());
+            t2.setDate(LocalDateTime.of(2025, 6, 2, 20, 45));
+
+            Transaction t3 = new Transaction(bankAccount1, bankAccount2, new BigDecimal("100.00"), bankAccount1.getUser());
+            t3.setDate(LocalDateTime.of(2023, 1, 1, 12, 0));
+
+            Transaction t4 = new Transaction(bankAccount2, bankAccount1, new BigDecimal("750.00"), bankAccount2.getUser());
+            t4.setDate(LocalDateTime.of(2025, 5, 4, 16, 45));
+
+            Transaction t5 = new Transaction(bankAccount1, bankAccount2, new BigDecimal("300.00"), bankAccount1.getUser());
+            t5.setDate(LocalDateTime.of(2025, 5, 23, 9, 33));
+
+            transactionRepository.save(t1);
+            transactionRepository.save(t2);
+            transactionRepository.save(t3);
+            transactionRepository.save(t4);
+            transactionRepository.save(t5);
 
             System.out.println("Seeded test users!");
         }

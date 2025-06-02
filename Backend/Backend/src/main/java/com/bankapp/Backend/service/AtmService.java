@@ -24,11 +24,11 @@ public class AtmService {
         BankAccount account = bankAccountRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Account not found"));
 
-        if (account.getAmount() < request.getAmount()) {
+        if (account.getAmount().compareTo(request.getAmount()) < 0) {
             return "Insufficient funds";
         }
 
-        account.setAmount(account.getAmount() - request.getAmount());
+        account.setAmount(account.getAmount().subtract(request.getAmount()));
         bankAccountRepository.save(account);
 
         return "Withdrawal successful. New balance: " + account.getAmount();

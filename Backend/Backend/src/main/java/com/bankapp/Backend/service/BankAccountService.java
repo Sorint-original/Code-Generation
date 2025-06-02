@@ -9,6 +9,8 @@ import com.bankapp.Backend.repository.UserRepository;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+
 @Service
 public class BankAccountService {
 
@@ -21,5 +23,25 @@ public class BankAccountService {
     }
 
 
+    public void approveCustomer(User user) {
 
+        if (user.getRole() != Role.CUSTOMER) {
+            throw new IllegalArgumentException("Only customers can be approved.");
+        }
+
+        if (!user.getBankAccounts().isEmpty()) {
+            throw new IllegalStateException("Customer already has accounts.");
+        }
+
+
+
+        BankAccount checking = new BankAccount(user, AccountType.CHECKING, ibanGenerator.generateDutchIBAN());
+        BankAccount savings = new BankAccount(user, AccountType.SAVINGS, ibanGenerator.generateDutchIBAN());
+
+        bankAccountRepository.save(checking);
+        bankAccountRepository.save(savings);
+    }
+    public void changeDailyLimit(String iban, BigDecimal newLimit) {
+        bankAccountRepository.updateDailyLimitByIban(iban, newLimit);
+    }
 }

@@ -115,4 +115,8 @@ public class TransactionService {
         return transactionRepository.findAllTransactions();
     }
 
+    public List<Transaction> fetchUserTransactionHistory(long userId) {
+        return transactionRepository.findAllUserRelatedTransactions(userId);
+    }
+
 }

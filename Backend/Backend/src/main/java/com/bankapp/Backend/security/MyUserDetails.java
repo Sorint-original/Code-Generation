@@ -32,6 +32,11 @@ public class MyUserDetails implements UserDetails {
         return user.getEmail();
     }
 
+
+    public long getId() {
+        return user.getId();
+    }
+
     @Override
     public boolean isAccountNonExpired() {
         return true;

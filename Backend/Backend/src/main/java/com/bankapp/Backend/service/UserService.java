@@ -5,6 +5,7 @@ import com.bankapp.Backend.DTO.CustomerRegistrationResponse;
 import com.bankapp.Backend.model.*;
 import com.bankapp.Backend.repository.BankAccountRepository;
 import com.bankapp.Backend.repository.UserRepository;
+import com.bankapp.Backend.security.AuthUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -88,7 +89,10 @@ public class UserService {
     public User findById(Long id) {
         return userRepository.findById(id).orElse(null);
     }
-  
+
+    public long getCurrentUserId() {
+        return AuthUtils.getCurrentUserId();
+    }
 
 
 

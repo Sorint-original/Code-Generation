@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
-import { useAuthStore } from "../stores//authstore";
+import { useAuthStore } from "../stores/authstore";
 import LoginPage from "../views/LoginPage.vue";
+import Atm from "../views/Atm.vue";
 import RegisterPage from "../views/RegisterPage.vue";
 import TestPage from "../views/Testpage.vue";
 import EmployeeDashboard from "@/views/EmployeeDashboard.vue";
@@ -9,6 +10,7 @@ import UnAuthorizedPage from "@/views/UnAuthorized.vue";
 const routes = [
   { path: "/login", component: LoginPage },
   { path: "/register", component: RegisterPage },
+  {path: "/Atm", component: Atm },
   { path: "/test", component: TestPage, meta: { requiresAuth: true } },
   {
     path: '/employee',
@@ -17,8 +19,6 @@ const routes = [
     meta: { requiresAuth: true, role: 'EMPLOYEE' }
   },
     { path: "/unauthorized", component: UnAuthorizedPage },
-
-
 ];
 
 const router = createRouter({

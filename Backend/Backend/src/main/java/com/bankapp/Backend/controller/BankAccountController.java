@@ -33,9 +33,9 @@ public class BankAccountController {
     }
 
     // ✅ Get account info (user + account list)
-    @GetMapping("/info/{userId}")
-    public ResponseEntity<AccountInfoResponse> getAccountInfo(@PathVariable Long userId) {
-        List<BankAccount> accounts = bankAccountService.getBankAccountsByUserId(userId);
+    @GetMapping("/info")
+    public ResponseEntity<AccountInfoResponse> getAccountInfo() {
+        List<BankAccount> accounts = bankAccountService.getBankAccountsByUserId(bankAccountService.getCurrentUserId());
         return ResponseEntity.ok(infoToResponse(accounts));
     }
 

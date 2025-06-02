@@ -5,12 +5,16 @@ import com.bankapp.Backend.DTO.BankAccountResponse;
 import com.bankapp.Backend.model.AccountStatus;
 import com.bankapp.Backend.model.BankAccount;
 import com.bankapp.Backend.model.User;
+import com.bankapp.Backend.security.JwtProvider;
 import com.bankapp.Backend.service.BankAccountService;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/account")

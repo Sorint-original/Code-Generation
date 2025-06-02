@@ -10,6 +10,7 @@ import com.bankapp.Backend.service.BankAccountService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ public class BankAccountController {
         return ResponseEntity.ok(infoToResponse(accounts));
     }
 
-    // ✅ Update account status by IBAN
+    @PreAuthorize("hasRole('EMPLOYEE')")
     @PutMapping("close/{iban}")
     public ResponseEntity<Void> updateAccountStatus(@PathVariable String iban) {
         bankAccountService.updateAccountStatus(iban, AccountStatus.BLOCKED);

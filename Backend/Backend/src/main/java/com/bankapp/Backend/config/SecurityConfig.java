@@ -43,6 +43,10 @@ public class SecurityConfig {
                         .requestMatchers("/v3/api-docs/**").permitAll()
 
 
+                        .requestMatchers("/api/login").permitAll()
+                        .requestMatchers("/api/user/register").permitAll()
+
+
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

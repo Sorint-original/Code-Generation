@@ -36,4 +36,9 @@ public interface BankAccountRepository extends JpaRepository<BankAccount, Long> 
     @Transactional
     @Query("UPDATE BankAccount b SET b.status = :status WHERE b.iban = :iban")
     void updateStatusByIban(@Param("iban") String iban, @Param("status") AccountStatus status);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE BankAccount b SET b.amount = :amount WHERE b.iban = :iban")
+    void updateAmountByIban(@Param("iban") String iban, @Param("amount") BigDecimal amount);
 }

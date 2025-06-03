@@ -75,6 +75,7 @@
 <script setup>
 import { ref } from 'vue'
 import api from '@/api/api'
+import { useAuthStore } from '@/stores/authstore'
 
 const sourceIban = ref('')
 const destinationIban = ref('')
@@ -82,22 +83,42 @@ const amount = ref(0)
 const successMessage = ref('')
 const errorMessage = ref('')
 
+// Extract user email from JWT token
+function getUserEmail() {
+  const authStore = useAuthStore()
+  const token = authStore.token
+  if (!token) return null
+
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]))
+    return payload.sub // Assuming 'sub' contains the email
+  } catch (e) {
+    console.error('Failed to decode token:', e)
+    return null
+  }
+}
+
 async function transferFunds() {
   try {
+    const email = getUserEmail()
+
     await api.post('/employee/transfer', {
       sourceIban: sourceIban.value,
       destinationIban: destinationIban.value,
       amount: amount.value,
+      email: email, // Pass email in the request body
+      accountType: 'CHECKING'
     })
 
-    successMessage.value = '✅ Transfer completed successfully.'
+    successMessage.value = 'Transfer completed successfully.'
     errorMessage.value = ''
     sourceIban.value = ''
     destinationIban.value = ''
     amount.value = 0
   } catch (err) {
     successMessage.value = ''
-    errorMessage.value = err.response?.data?.message || '❌ Transfer failed. Please check the IBANs and balance.'
+    errorMessage.value =
+      err.response?.data?.message || 'Transfer failed. Please check the IBANs and balance.'
     console.error('Transfer error:', err)
   }
 }

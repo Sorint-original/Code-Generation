@@ -9,12 +9,6 @@
             <button class="btn w-100" :class="{ 'btn-primary': activePage === 'unapproved' }" @click="activePage = 'unapproved'">
               Approve Customers
             </button>
-            <router-link to="/account/all" class="btn w-100 btn-primary">
-              View All Accounts
-            </router-link>
-            <router-link to="/account" class="btn w-100 btn-primary">
-              My Accounts
-            </router-link>
           </li>
           <!-- Add more nav items here later -->
           <li class="nav-item mb-2">
@@ -22,11 +16,29 @@
               Transactions
             </button>
           </li>
+          <li class="nav-item mb-2">
+            <button class="btn w-100" :class="{ 'btn-primary': activePage === 'allaccounts' }" @click="activePage = 'allaccounts'">
+              All Accounts
+            </button>
+          </li>
+          <li class="nav-item mb-2">
+            <button class="btn w-100" :class="{ 'btn-primary': activePage === 'transferfunds' }" @click="activePage = 'transferfunds'">
+              Transfer Funds
+            </button>
+          </li>
         </ul>
       </div>
 
       <!-- Main Content -->
       <div class="col-md-9 p-4">
+        <div v-if="activePage === 'allaccounts'">
+          <AllAccounts />
+        </div>
+
+        <div v-if="activePage === 'transferfunds'">
+          <TransferFunds />
+        </div>
+        
         <div v-if="activePage === 'unapproved'">
           <h3>Unapproved Customers</h3>
 
@@ -144,6 +156,48 @@
           <p v-if="!loading && transactions.length === 0">No transactions found.</p>
 
         </div>
+
+        <!-- All accounts -->
+        <div v-if="activePage === 'allaccounts'">
+          <div class="employee-page d-flex justify-content-center align-items-center vh-100">
+    <div class="card p-4 shadow-lg w-100 mx-5" style="max-width: 1200px; max-height: 90vh; overflow-y: auto;">
+      <h2 class="text-center fw-bold mb-4">All Customer Accounts</h2>
+
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>User ID</th>
+            <th>IBAN</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th class="text-end">Balance</th>
+            <th class="text-center">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="account in accounts" :key="account.iban">
+            <td>{{ account.userId }}</td>
+            <td>{{ account.iban }}</td>
+            <td>{{ account.type }}</td>
+            <td>{{ account.status }}</td>
+            <td class="text-end">€{{ account.amount.toFixed(2) }}</td>
+            <td class="text-center">
+              <button
+                class="btn btn-sm btn-danger"
+                :disabled="account.status === 'BLOCKED' || loadingIbans.includes(account.iban)"
+                @click="closeAccount(account.iban)"
+              >
+                {{ loadingIbans.includes(account.iban) ? 'Closing...' : 'Close' }}
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div v-if="error" class="text-danger mt-3 text-center">{{ error }}</div>
+    </div>
+  </div>
+        </div>
         <!-- Placeholder for future pages -->
         <div v-else>
           <p>Select a section from the sidebar.</p>
@@ -155,9 +209,15 @@
 
 <script>
 import api from '@/api/api';
+import AllAccounts from '@/views/AllAccountsPage.vue';
+import TransferFunds from '@/views/TransferFundsPage.vue';
 
 export default {
   name: 'EmployeeDashboard',
+  components: {
+    AllAccounts,
+    TransferFunds
+  },
   data() {
     return {
       activePage: 'unapproved',
@@ -198,6 +258,7 @@ export default {
         this.errorMessage = 'Failed to approve customer.';
       }
     },
+    
 
     async unapproveCustomer(id) {
       try {

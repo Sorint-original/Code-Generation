@@ -1,5 +1,7 @@
 package com.bankapp.Backend.service;
 
+import com.bankapp.Backend.DTO.AccountInfoResponse;
+import com.bankapp.Backend.DTO.BankAccountResponse;
 import com.bankapp.Backend.model.*;
 import com.bankapp.Backend.repository.BankAccountRepository;
 import com.bankapp.Backend.repository.UserRepository;
@@ -10,9 +12,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 
 @Service
 public class BankAccountService {
@@ -72,5 +74,35 @@ public class BankAccountService {
         }
 
         throw new RuntimeException("Unauthorized");
+    }
+
+    public List<BankAccountResponse> accountsToResponses(List<BankAccount> accounts) {
+        List<BankAccountResponse> responses = new ArrayList<>();
+
+        for (BankAccount account : accounts) {
+            BankAccountResponse response = new BankAccountResponse(account.getId(),
+                    account.getUser().getId(),
+                    account.getAmount(),
+                    account.getAccountType(),
+                    account.getIban(),
+                    account.getAbsoluteTransferLimit(),
+                    account.getDailyTransferLimit(),
+                    account.getStatus());
+            responses.add(response);
+        }
+
+        return responses;
+    }
+
+    public AccountInfoResponse infoToResponse(List<BankAccount> accounts) {
+        User user = accounts.get(0).getUser();
+        AccountInfoResponse response = new AccountInfoResponse(user.getId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getUserName(),
+                user.getEmail(),
+                user.getPhoneNumber(),
+                accountsToResponses(accounts));
+        return response;
     }
 }

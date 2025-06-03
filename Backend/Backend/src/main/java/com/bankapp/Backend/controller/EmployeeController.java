@@ -77,13 +77,6 @@ public class EmployeeController {
         return ResponseEntity.ok("User status updated to " + CustomerStatus.Denied);
     }
 
-
-    // Code for the employee transaction record
-    @GetMapping("/transaction-history")
-    public ResponseEntity<List<Transaction>> getTransactionHistory() {
-        return ResponseEntity.ok(this.transactionService.fetchTransactionHistory());
-    }
-
     @PostMapping("/change-limit")
     public ResponseEntity<ChangeDailyLimitResponse> changeDailyLimit(@RequestBody ChangeDailyLimitRequest request) {
         try{

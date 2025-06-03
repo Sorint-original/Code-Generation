@@ -29,6 +29,7 @@ const routes = [
     { path: "/account", component: AccountInfoPage },
     { path: "/account/all", component: AllAccountsPage },
     { path: "/transfer", component: TransferFundsPage },
+
 ];
 
 const router = createRouter({

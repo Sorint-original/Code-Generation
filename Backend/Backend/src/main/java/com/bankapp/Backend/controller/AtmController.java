@@ -1,12 +1,12 @@
 package com.bankapp.Backend.controller;
 
 
-import com.bankapp.Backend.DTO.WithdrawRequest;
+import com.bankapp.Backend.DTO.AtmRequest;
 import com.bankapp.Backend.service.AtmService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/atm")
+@RequestMapping("/api/atm")
 public class AtmController {
 
     private final AtmService atmService;
@@ -16,7 +16,12 @@ public class AtmController {
     }
 
     @PostMapping("/withdraw")
-    public String withdraw(@RequestBody WithdrawRequest request) {
+    public String withdraw(@RequestBody AtmRequest request) {
         return atmService.withdraw(request);
+    }
+
+    @PostMapping("/deposit")
+    public String deposit(@RequestBody AtmRequest request) {
+        return atmService.deposit(request);
     }
 }

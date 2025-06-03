@@ -1,38 +1,52 @@
 <script setup>
   import { ref } from 'vue'
+  import api from '@/api/api';
+
 
   const showButtons = ref(true)
+  const withDrawButton = ref(false)
+  const depositButton = ref(false)
   const amount = ref('')
 
+
   function withdraw() {
-    showButtons.value = false
+    showButtons.value = false;
+    withDrawButton.value = true;
   }
 
-  async function confirmWithdraw() {
-    const token = localStorage.getItem('token')
-    if (!token) {
-      alert('User not authenticated')
-      return
+  function deposit(){
+    showButtons.value = false;
+    depositButton.value = true;
+  }
+
+  async function confirm() {
+      const payload = {
+    amount: amount.value
+  };
+
+  try {
+    let response;
+
+    if (withDrawButton.value) {
+      response = await api.post('/atm/withdraw', payload);
+    } else if (depositButton.value) {
+      response = await api.post('/atm/deposit', payload);
+    } else {
+      throw new Error("No transaction type selected.");
     }
 
-    const response = await fetch('/atm/withdraw', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        token: token,
-        amount: parseFloat(amount.value)
-      })
-    })
-
-    const result = await response.text()
-    alert(result)
-
-    // Reset UI
-    amount.value = ''
-    showButtons.value = true
+    alert(response.data);
+  } catch (err) {
+    alert(err.response?.data || 'Transaction failed. Please try again.');
   }
+
+  // Reset UI
+  amount.value = '';
+  showButtons.value = true;
+  withDrawButton.value = false;
+  depositButton.value = false;
+}
+
 </script>
 
 <template>
@@ -59,10 +73,15 @@
 
     <template v-else>
       <div class="mx-auto" style="width: 300px;">
-        <label for="amount" class="form-label" style="font-size:1.5rem;">Enter amount to withdraw:</label>
+        <template v-if="withDrawButton">
+          <label for="amount" class="form-label" style="font-size:1.5rem;">Enter amount to withdraw:</label>
+        </template>
+        <template v-else>
+          <label for="amount" class="form-label" style="font-size:1.5rem;">Enter amount to deposit:</label>
+        </template>
         <input
           id="amount"
-          v-model="amount"
+          v-model.number="amount"
           type="number"
           class="form-control form-control-lg"
           placeholder="Amount"
@@ -70,7 +89,7 @@
         <button
           class="btn btn-success mt-3 w-100"
           style="font-size:1.5rem;"
-          @click="confirmWithdraw"
+          @click="confirm"
         >
           Confirm
         </button>

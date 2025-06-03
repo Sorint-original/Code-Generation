@@ -10,23 +10,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.bankapp.Backend.security.AuthUtils.getCurrentUserId;
+
 @Service
 public class AtmService {
     private final BankAccountRepository bankAccountRepository;
 
     public AtmService(BankAccountRepository bankAccountRepository, JwtProvider jwtProvider) {
         this.bankAccountRepository = bankAccountRepository;
-    }
-
-    public Long getCurrentUserId() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        if (auth != null && auth.isAuthenticated()) {
-            MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
-            return userDetails.getUser().getId();
-        }
-
-        throw new RuntimeException("Unauthorized");
     }
 
 

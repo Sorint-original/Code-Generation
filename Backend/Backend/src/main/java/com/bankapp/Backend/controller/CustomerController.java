@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController  // ✅ REQUIRED
-@RequestMapping("/customer")  // ✅ REQUIRED
+@RequestMapping("/api/customer")  // ✅ REQUIRED
 public class CustomerController {
 
     private final CustomerService customerService;

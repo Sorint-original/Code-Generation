@@ -41,13 +41,19 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/swagger-ui.html").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll()
-                        //.requestMatchers("/api/**").permitAll()
 
 
                         .requestMatchers("/api/login").permitAll()
                         .requestMatchers("/api/user/register").permitAll()
 
                         .requestMatchers("/api/transfer").permitAll()
+                        .requestMatchers("/login").permitAll()
+                        .requestMatchers("/user/register").permitAll()
+                        .requestMatchers("/employee/**").permitAll()
+                        .requestMatchers("/api/atm/**").permitAll()
+
+
+
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

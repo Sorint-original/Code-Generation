@@ -5,7 +5,7 @@ import Atm from "../views/Atm.vue";
 import RegisterPage from "../views/RegisterPage.vue";
 import TransferForm from '../views/TransactionForm.vue'
 import TestPage from "../views/Testpage.vue";
-import TransactionHistory from "../views/CustomerTransactions.vue";
+import UserTransactions from "../views/UserTransactions.vue";
 import EmployeeDashboard from "@/views/EmployeeDashboard.vue";
 import UnAuthorizedPage from "@/views/UnAuthorized.vue";
 
@@ -13,7 +13,7 @@ const routes = [
   { path: "/login", component: LoginPage },
   { path: "/register", component: RegisterPage },
   { path: '/transaction', component: TransferForm, meta: {requiresAuth: true} },
-  { path: "/transaction-history", component: TransactionHistory, meta: { requiresAuth: true } },
+  { path: "/transaction-history", component: UserTransactions, meta: { requiresAuth: true } },
   {path: "/Atm", component: Atm },
   { path: "/test", component: TestPage, meta: { requiresAuth: true } },
   {

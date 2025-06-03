@@ -25,7 +25,7 @@ public class TransactionHistoryController {
         this.transactionService = transactionService;
     }
 
-    @GetMapping("/fetchAllUserTransactions")
+    @GetMapping("/fetchLoggedUserTransactions")
     public ResponseEntity<List<Transaction>> getUnapprovedCustomers() {
         long userId = userService.getCurrentUserId();
         return ResponseEntity.ok(transactionService.fetchUserTransactionHistory(userId));

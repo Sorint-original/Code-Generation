@@ -1,6 +1,6 @@
 <template>
   <div class="container-fluid min-vh-100 bg-light">
-    <h3>User Transacctions</h3>
+    <h3>User Transactions</h3>
 
     <!-- Filter Section -->
     <div class="card mb-4">
@@ -111,7 +111,7 @@
          this.loading = true;
          this.errorMessage = '';
          try {
-           const response = await api.get('/transactionHistory/fetchAllUserTransactions');
+           const response = await api.get('/transactionHistory/fetchLoggedUserTransactions');
            this.transactions = response.data;
          } catch (err) {
            this.errorMessage = 'Failed to load transactions.';

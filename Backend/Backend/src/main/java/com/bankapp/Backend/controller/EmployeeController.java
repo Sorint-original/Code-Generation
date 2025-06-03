@@ -5,9 +5,11 @@ import com.bankapp.Backend.DTO.ChangeDailyLimitResponse;
 import com.bankapp.Backend.model.BankAccount;
 import com.bankapp.Backend.model.CustomerStatus;
 import com.bankapp.Backend.model.Role;
+import com.bankapp.Backend.model.Transaction;
 import com.bankapp.Backend.model.User;
 import com.bankapp.Backend.service.BankAccountService;
 import com.bankapp.Backend.service.EmployeeService;
+import com.bankapp.Backend.service.TransactionService;
 import com.bankapp.Backend.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,25 +20,42 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/employee")
-//@PreAuthorize("hasRole('EMPLOYEE')")
+
+@RequestMapping("/api/employee")
+@PreAuthorize("hasRole('EMPLOYEE')")
+
 public class EmployeeController {
 
     private final UserService userService;
     private final EmployeeService employeeService;
+
+    private final TransactionService transactionService;
     private final BankAccountService bankAccountService;
-
-
-    public EmployeeController(UserService userService, EmployeeService employeeService, BankAccountService bankAccountService) {
+  
+    public EmployeeController(UserService userService, EmployeeService employeeService, TransactionService transactionService, BankAccountService bankAccountService) {
         this.userService = userService;
         this.employeeService = employeeService;
+        this.transactionService = transactionService;
         this.bankAccountService = bankAccountService;
+
     }
 
     @GetMapping("/unapproved-customers")
     public ResponseEntity<List<User>> getUnapprovedCustomers() {
         return ResponseEntity.ok(userService.findUnapprovedUsers(Role.CUSTOMER));
     }
+
+    @GetMapping("/user/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable Long id) {
+        User user = userService.findById(id);
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+        }
+
+        return ResponseEntity.ok(user);
+    }
+
 
     @PostMapping("/customers/{id}/approve")
     public ResponseEntity<?> approveCustomer(@PathVariable Long id) {
@@ -58,6 +77,13 @@ public class EmployeeController {
         return ResponseEntity.ok("User status updated to " + CustomerStatus.Denied);
     }
 
+
+    // Code for the employee transaction record
+    @GetMapping("/transaction-history")
+    public ResponseEntity<List<Transaction>> getTransactionHistory() {
+        return ResponseEntity.ok(this.transactionService.fetchTransactionHistory());
+    }
+
     @PostMapping("/change-limit")
     public ResponseEntity<ChangeDailyLimitResponse> changeDailyLimit(@RequestBody ChangeDailyLimitRequest request) {
         try{
@@ -73,4 +99,5 @@ public class EmployeeController {
             return ResponseEntity.badRequest().body(response);
         }
     }
+
 }

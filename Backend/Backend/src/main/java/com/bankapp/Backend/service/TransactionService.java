@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 public class TransactionService {
@@ -107,6 +108,15 @@ public class TransactionService {
     private void saveTransaction(BankAccount from, BankAccount to, BigDecimal amount, User initiator) {
         Transaction txn = new Transaction(from, to, amount, initiator);
         transactionRepository.save(txn);
+    }
+
+    //Fetch transaction history
+    public List<Transaction> fetchTransactionHistory() {
+        return transactionRepository.findAllTransactions();
+    }
+
+    public List<Transaction> fetchUserTransactionHistory(long userId) {
+        return transactionRepository.findAllUserRelatedTransactions(userId);
     }
 
 }

@@ -1,5 +1,6 @@
 package com.bankapp.Backend.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -14,6 +15,7 @@ public class BankAccount {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "user_id")
+    @JsonBackReference
     private User user;
 
     private BigDecimal amount = BigDecimal.ZERO.setScale(2);
@@ -117,4 +119,7 @@ public class BankAccount {
     }
 
 
+    public AccountType getAccountType() {
+        return type;
+    }
 }

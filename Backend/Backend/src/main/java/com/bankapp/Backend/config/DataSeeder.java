@@ -101,8 +101,8 @@ public class DataSeeder implements ApplicationRunner {
                     new BigDecimal("987654321.123456789");
 
 
-            BankAccount bankAccount1 = new BankAccount(user2, new BigDecimal("10000.00"), AccountType.CHECKING, "21345643211", new BigDecimal("0.01"), new BigDecimal("1000.00"), AccountStatus.APPROVED);
-            BankAccount bankAccount2 = new BankAccount(user2, new BigDecimal("10000.00"), AccountType.CHECKING, "2134564321", new BigDecimal("0.01"), new BigDecimal("1000.00"), AccountStatus.APPROVED);
+            BankAccount bankAccount1 = new BankAccount(user1, new BigDecimal("10000.00"), AccountType.CHECKING, "21345643211", new BigDecimal("1000.00"), new BigDecimal("1000.00"), AccountStatus.APPROVED);
+            BankAccount bankAccount2 = new BankAccount(user2, new BigDecimal("10000.00"), AccountType.CHECKING, "2134564321", new BigDecimal("1000.00"), new BigDecimal("1000.00"), AccountStatus.APPROVED);
 
             bankAccountRepository.save(bankAccount1);
             bankAccountRepository.save(bankAccount2);

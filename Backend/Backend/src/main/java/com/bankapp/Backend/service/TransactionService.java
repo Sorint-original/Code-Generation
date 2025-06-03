@@ -57,6 +57,18 @@ public class TransactionService {
         saveTransaction(from, to, request.getAmount(), initiator);
     }
 
+    @Transactional
+    public void transferFundsEmployee(TransactionRequest request) {
+        BankAccount from = findAccountByIban(request.getFromAccountIban(), "From account not found");
+        BankAccount to = findAccountByIban(request.getToAccountIban(), "To account not found");
+
+        if (from.getType() == AccountType.CHECKING && to.getType() == AccountType.CHECKING) {
+            validateTransfer(from, to, request.getAmount());
+            performTransfer(from, to, request.getAmount());
+            saveTransaction(from, to, request.getAmount(), userRepository.findUserByEmail(request.getInitiatorEmail()).get());
+        }
+    }
+
     // 🔍 Step 1: Find account by IBAN or throw error
     private BankAccount findAccountByIban(String iban, String errorMessage) {
         return bankAccountRepository.findByIban(iban)

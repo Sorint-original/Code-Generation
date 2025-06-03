@@ -8,6 +8,9 @@ import TestPage from "../views/Testpage.vue";
 import UserTransactions from "../views/UserTransactions.vue";
 import EmployeeDashboard from "@/views/EmployeeDashboard.vue";
 import UnAuthorizedPage from "@/views/UnAuthorized.vue";
+import AccountInfoPage from "@/views/AccountInfoPage.vue";
+import AllAccountsPage from "@/views/AllAccountsPage.vue";
+import TransferFundsPage from "@/views/TransferFundsPage.vue";
 
 const routes = [
   { path: "/login", component: LoginPage },
@@ -23,6 +26,10 @@ const routes = [
     meta: { requiresAuth: true, role: 'EMPLOYEE' }
   },
     { path: "/unauthorized", component: UnAuthorizedPage },
+    { path: "/account", component: AccountInfoPage },
+    { path: "/account/all", component: AllAccountsPage },
+    { path: "/transfer", component: TransferFundsPage },
+
 ];
 
 const router = createRouter({

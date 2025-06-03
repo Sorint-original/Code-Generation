@@ -90,9 +90,11 @@ public class UserService {
         return userRepository.findById(id).orElse(null);
     }
 
+
     public long getCurrentUserId() {
         return AuthUtils.getCurrentUserId();
     }
+
 
 
 

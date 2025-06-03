@@ -18,16 +18,24 @@
           </div>
         </div>
 
-        <div v-else>
-          <div class="mb-3">
-            <label class="form-label">From IBAN</label>
-            <input v-model="fromIban" type="text" class="form-control" required />
-          </div>
+        <div class="mb-3">
+          <label class="form-label">Recipient First Name</label>
+          <input v-model="recipientFirstName" type="text" class="form-control" required />
         </div>
 
         <div class="mb-3">
-          <label class="form-label">To IBAN</label>
-          <input v-model="toIban" type="text" class="form-control" required />
+          <label class="form-label">Recipient Last Name</label>
+          <input v-model="recipientLastName" type="text" class="form-control" required />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Select Recipient Account</label>
+          <select v-model="toIban" class="form-select mb-3">
+            <option disabled value="">-- Select IBAN --</option>
+            <option v-for="iban in recipientIbans" :key="iban.iban" :value="iban.iban">
+              {{ iban.type }} - {{ iban.iban }}
+            </option>
+          </select>
         </div>
 
         <div class="mb-3">
@@ -60,6 +68,9 @@ export default {
       amount: null,
       errorMessage: '',
       successMessage: '',
+      recipientFirstName: '',
+      recipientLastName: '',
+      recipientIbans: [],
       userIbans: {
         CHECKING: '',
         SAVINGS: ''
@@ -95,6 +106,17 @@ export default {
     updateFromIban() {
       this.fromIban = this.userIbans[this.selectedAccountType];
     },
+    async fetchRecipientIbans() {
+      try {
+        const res = await api.post('/customer/search-ibans', {
+          firstName: this.recipientFirstName,
+          lastName: this.recipientLastName
+        });
+        this.recipientIbans = res.data;
+      } catch (err) {
+        this.errorMessage = 'Recipient not found or no IBANs available';
+      }
+    },
     async submitTransfer() {
       this.errorMessage = '';
       this.successMessage = '';
@@ -112,11 +134,20 @@ export default {
         };
         await api.post('/transaction', payload);
         this.successMessage = 'Transfer successful!';
-        this.fromIban = '';
         this.toIban = '';
         this.amount = null;
+        this.recipientIbans = [];
+        this.recipientFirstName = '';
+        this.recipientLastName = '';
       } catch (err) {
         this.errorMessage = err.response?.data || 'Transfer failed. Please try again.';
+      }
+    }
+  },
+  watch: {
+    recipientLastName(newVal) {
+      if (this.recipientFirstName && newVal) {
+        this.fetchRecipientIbans();
       }
     }
   }

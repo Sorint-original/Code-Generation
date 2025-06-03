@@ -67,9 +67,12 @@ public class TransactionService {
             performTransfer(from, to, request.getAmount());
             saveTransaction(from, to, request.getAmount(), userRepository.findUserByEmail(request.getInitiatorEmail()).get());
         }
+<<<<<<< HEAD
         else {
             throw new IllegalArgumentException("Cannot transfer to of from Saving account.");
         }
+=======
+>>>>>>> 5d8c4f0 (accounts refactor)
     }
 
     // 🔍 Step 1: Find account by IBAN or throw error

@@ -106,7 +106,7 @@ async function transferFunds() {
       fromAccountIban: sourceIban.value,
       toAccountIban: destinationIban.value,
       amount: amount.value,
-      initiatorEmail: email, // Pass email in the request body
+      initiatorEmail: email,
       accountType: 'CHECKING'
     })
 

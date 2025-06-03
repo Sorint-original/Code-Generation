@@ -21,6 +21,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findUserByBsnNumber(String bsnNumber);
 
+    Optional<User> findUserByFirstNameAndLastName(String firstName , String lastName );
+
     List<User> findAllByRoleAndBankAccountsEmpty(Role role);
 
     @Modifying

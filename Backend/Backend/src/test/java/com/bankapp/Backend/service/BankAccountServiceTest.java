@@ -1,9 +1,6 @@
 package com.bankapp.Backend.service;
 
-import com.bankapp.Backend.model.AccountType;
-import com.bankapp.Backend.model.BankAccount;
-import com.bankapp.Backend.model.Role;
-import com.bankapp.Backend.model.User;
+import com.bankapp.Backend.model.*;
 import com.bankapp.Backend.repository.BankAccountRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,6 +10,7 @@ import org.mockito.Mock;
 
 import java.math.BigDecimal;
 import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -89,4 +87,37 @@ public class BankAccountServiceTest {
 
         verify(bankAccountRepository, times(1)).updateDailyLimitByIban(iban, newLimit);
     }
+
+    @Test
+    void getAllBankAccounts_ShouldReturnAllAccounts() {
+        List<BankAccount> mockAccounts = List.of(new BankAccount(), new BankAccount());
+        when(bankAccountRepository.findAll()).thenReturn(mockAccounts);
+
+        List<BankAccount> result = bankAccountService.getAllBankAccounts();
+
+        assertEquals(2, result.size());
+        verify(bankAccountRepository, times(1)).findAll();
+    }
+
+    @Test
+    void getBankAccountsByUserId_ShouldReturnUserAccounts() {
+        Long userId = 1L;
+        List<BankAccount> mockAccounts = List.of(new BankAccount());
+        when(bankAccountRepository.findBankAccountsByUserId(userId)).thenReturn(mockAccounts);
+
+        List<BankAccount> result = bankAccountService.getBankAccountsByUserId(userId);
+
+        assertFalse(result.isEmpty());
+        verify(bankAccountRepository).findBankAccountsByUserId(userId);
+    }
+
+    @Test
+    void updateAccountStatus_ShouldUpdateStatusToBlocked() {
+        String iban = "NL91ABNA0417164300";
+
+        bankAccountService.updateAccountStatus(iban, AccountStatus.BLOCKED);
+
+        verify(bankAccountRepository).updateStatusByIban(iban, AccountStatus.BLOCKED);
+    }
+
 }

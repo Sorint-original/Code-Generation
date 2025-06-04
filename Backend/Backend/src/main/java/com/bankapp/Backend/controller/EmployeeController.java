@@ -94,6 +94,8 @@ public class EmployeeController {
             ChangeDailyLimitResponse response = new ChangeDailyLimitResponse(null, false, e.getMessage() + "Failed to change daily limit");
             return ResponseEntity.badRequest().body(response);
         }
+    }
+
     @GetMapping("/account/all")
     public ResponseEntity<List<BankAccountResponse>> getAllBankAccounts() {
         List<BankAccount> accounts = bankAccountService.getAllBankAccounts();

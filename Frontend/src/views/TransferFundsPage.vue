@@ -103,10 +103,10 @@ async function transferFunds() {
     const email = getUserEmail()
 
     await api.post('/employee/transfer', {
-      sourceIban: sourceIban.value,
-      destinationIban: destinationIban.value,
+      fromAccountIban: sourceIban.value,
+      toAccountIban: destinationIban.value,
       amount: amount.value,
-      email: email, // Pass email in the request body
+      initiatorEmail: email, // Pass email in the request body
       accountType: 'CHECKING'
     })
 

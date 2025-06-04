@@ -90,18 +90,19 @@ public class EmployeeController {
 
     @PostMapping("/change-limit")
     public ResponseEntity<ChangeDailyLimitResponse> changeDailyLimit(@RequestBody ChangeDailyLimitRequest request) {
-        try{
+        try {
             BankAccount bankAccount = bankAccountService.GetBankAccount(request.getIban())
                     .orElseThrow(() -> new RuntimeException("Bank account not found"));
 
             bankAccountService.changeDailyLimit(bankAccount, request.getDailyLimit());
-            ChangeDailyLimitResponse response = new ChangeDailyLimitResponse(bankAccount,true,"Daily limit changes successfully");
+            ChangeDailyLimitResponse response = new ChangeDailyLimitResponse(bankAccount, true, "Daily limit changes successfully");
             return ResponseEntity.ok().body(response);
-        }
-        catch (Exception e){
-            ChangeDailyLimitResponse response = new ChangeDailyLimitResponse(null,false,e.getMessage()+ "Failed to change daily limit");
+        } catch (Exception e) {
+            ChangeDailyLimitResponse response = new ChangeDailyLimitResponse(null, false, e.getMessage() + "Failed to change daily limit");
             return ResponseEntity.badRequest().body(response);
         }
+    }
+
     @GetMapping("/account/all")
     public ResponseEntity<List<BankAccountResponse>> getAllBankAccounts() {
         List<BankAccount> accounts = bankAccountService.getAllBankAccounts();

@@ -1,6 +1,6 @@
 <template>
-  <div class="employee-page d-flex justify-content-center align-items-center vh-100">
-    <div class="card p-4 shadow-lg w-100 mx-5" style="max-width: 1200px; max-height: 90vh; overflow-y: auto;">
+  <div class="employee-page d-flex justify-content-center vh-100">
+    <div class="card p-4 w-100 mx-5" style="max-width: 1200px; max-height: 90vh; overflow-y: auto;">
       <h2 class="text-center fw-bold mb-4">All Customer Accounts</h2>
 
       <table class="table table-hover align-middle">
@@ -49,7 +49,7 @@ const loadingIbans = ref([])
 
 const fetchAccounts = async () => {
   try {
-    const response = await api.get('/account/all')
+    const response = await api.get('employee/account/all')
     accounts.value = response.data
   } catch (err) {
     error.value = 'Failed to load accounts.'
@@ -60,7 +60,7 @@ const fetchAccounts = async () => {
 const closeAccount = async (iban) => {
   try {
     loadingIbans.value.push(iban)
-    await api.put(`/account/close/${iban}`)
+    await api.put(`/employee/account/close/${iban}`)
 
     // update local status
     const acc = accounts.value.find(a => a.iban === iban)
@@ -77,7 +77,5 @@ onMounted(fetchAccounts)
 </script>
 
 <style scoped>
-.employee-page {
-  background: linear-gradient(to right, #93FB9D, #09C7FB);
-}
+
 </style>

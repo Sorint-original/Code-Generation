@@ -7,6 +7,9 @@ import com.bankapp.Backend.model.CustomerStatus;
 import com.bankapp.Backend.model.Role;
 import com.bankapp.Backend.model.Transaction;
 import com.bankapp.Backend.model.User;
+import com.bankapp.Backend.DTO.BankAccountResponse;
+import com.bankapp.Backend.DTO.TransactionRequest;
+import com.bankapp.Backend.model.*;
 import com.bankapp.Backend.service.BankAccountService;
 import com.bankapp.Backend.service.EmployeeService;
 import com.bankapp.Backend.service.TransactionService;
@@ -17,7 +20,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 
@@ -32,6 +34,8 @@ public class EmployeeController {
     private final TransactionService transactionService;
     private final BankAccountService bankAccountService;
   
+
+
     public EmployeeController(UserService userService, EmployeeService employeeService, TransactionService transactionService, BankAccountService bankAccountService) {
         this.userService = userService;
         this.employeeService = employeeService;
@@ -79,18 +83,34 @@ public class EmployeeController {
 
     @PostMapping("/change-limit")
     public ResponseEntity<ChangeDailyLimitResponse> changeDailyLimit(@RequestBody ChangeDailyLimitRequest request) {
-        try{
+        try {
             BankAccount bankAccount = bankAccountService.GetBankAccount(request.getIban())
                     .orElseThrow(() -> new RuntimeException("Bank account not found"));
 
             bankAccountService.changeDailyLimit(bankAccount, request.getDailyLimit());
-            ChangeDailyLimitResponse response = new ChangeDailyLimitResponse(bankAccount,true,"Daily limit changes successfully");
+            ChangeDailyLimitResponse response = new ChangeDailyLimitResponse(bankAccount, true, "Daily limit changes successfully");
             return ResponseEntity.ok().body(response);
-        }
-        catch (Exception e){
-            ChangeDailyLimitResponse response = new ChangeDailyLimitResponse(null,false,e.getMessage()+ "Failed to change daily limit");
+        } catch (Exception e) {
+            ChangeDailyLimitResponse response = new ChangeDailyLimitResponse(null, false, e.getMessage() + "Failed to change daily limit");
             return ResponseEntity.badRequest().body(response);
         }
     }
 
+    @GetMapping("/account/all")
+    public ResponseEntity<List<BankAccountResponse>> getAllBankAccounts() {
+        List<BankAccount> accounts = bankAccountService.getAllBankAccounts();
+        return ResponseEntity.ok(bankAccountService.accountsToResponses(accounts));
+    }
+
+    @PutMapping("/account/close/{iban}")
+    public ResponseEntity<Void> updateAccountStatus(@PathVariable String iban) {
+        bankAccountService.updateAccountStatus(iban, AccountStatus.BLOCKED);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/transfer")
+    public ResponseEntity<Void> transferFunds(@RequestBody TransactionRequest transactionRequest) {
+        transactionService.transferFundsEmployee(transactionRequest);
+        return ResponseEntity.ok().build();
+    }
 }

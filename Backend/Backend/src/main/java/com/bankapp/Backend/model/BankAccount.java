@@ -62,6 +62,8 @@ public class BankAccount {
         return id;
     }
 
+    public void setId(Long id) { this.id = id; }
+
     public User getUser() {
         return user;
     }

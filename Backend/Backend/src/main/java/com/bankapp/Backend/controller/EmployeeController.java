@@ -102,15 +102,6 @@ public class EmployeeController {
         return ResponseEntity.ok(bankAccountService.accountsToResponses(accounts));
     }
 
-<<<<<<< HEAD
-    @GetMapping("/account/all")
-    public ResponseEntity<List<BankAccountResponse>> getAllBankAccounts() {
-        List<BankAccount> accounts = bankAccountService.getAllBankAccounts();
-        return ResponseEntity.ok(bankAccountService.accountsToResponses(accounts));
-    }
-
-=======
->>>>>>> 5d8c4f0 (accounts refactor)
     @PutMapping("/account/close/{iban}")
     public ResponseEntity<Void> updateAccountStatus(@PathVariable String iban) {
         bankAccountService.updateAccountStatus(iban, AccountStatus.BLOCKED);

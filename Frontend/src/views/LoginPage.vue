@@ -56,29 +56,32 @@ export default {
         const response = await api.post("/login", {
           email: this.email,
           password: this.password,
-        });
-
+        })    ;
+      
         this.authStore.login(response.data.token);
-        console.log("Login successful:", response.data);
+        this.errorMessages = ""   ;
+      
         const role = this.authStore.role;
-
+        if (role === "EMPLOYEE") {
+          this.router.push("/employee");
+        } else {
+          this.router.push("/");
+            }
         
-        if (role === 'EMPLOYEE') {
-          this.router.push('/employee');
-        } else {
-          this.router.push('/');
-        }
-
-
       } catch (error) {
-        if (error.response && error.response.status === 401) {
-          this.errorMessages = "Invalid email or password.";
+        if (error.response && error.response.data) {
+          this.errorMessages =
+            error.response.data.message || "Login failed. Please try again.";
         } else {
-          this.errorMessages = "An error occurred. Please try again.";
-        }
+          this.errorMessages = "Network error. Please check your connection.";
+            }
+        
         console.error("Login failed:", error);
       }
     },
+
+    
+    
     goToRegister() {
       this.router.push("/register");
     },

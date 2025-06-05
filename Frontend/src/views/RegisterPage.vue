@@ -62,19 +62,27 @@ export default {
     async register() {
       try {
         const response = await api.post("/user/register", this.form);
+      
         if (response.data.success) {
           this.successMessage = response.data.message;
           this.errorMessage = "";
-          this.goToLogin();
+          setTimeout(() => this.goToLogin(), 1500); 
         } else {
-          this.errorMessage = response.data.message;
+          this.errorMessage = response.data.message || "Registration failed.";
           this.successMessage = "";
         }
+      
       } catch (error) {
-        this.errorMessage = "Something went wrong. Please try again.";
+        if (error.response && error.response.data) {
+          this.errorMessage = error.response.data.message || "Unexpected error occurred.";
+        } else {
+          this.errorMessage = "Network error. Please try again.";
+        }
+        this.successMessage = "";
         console.error("Registration error:", error);
       }
     },
+
 
     goToLogin() {
       this.$router.push("/login");

@@ -11,16 +11,6 @@
             </button>
           </li>
           <li class="nav-item mb-2">
-            <router-link to="/account/all" class="btn w-100 btn-primary">
-              View All Accounts
-            </router-link>
-          </li>
-          <li class="nav-item mb-2">
-            <router-link to="/account" class="btn w-100 btn-primary">
-              My Accounts
-            </router-link>
-          </li>
-          <li class="nav-item mb-2">
             <button class="btn w-100" :class="{ 'btn-primary': activePage === 'transactionhistory' }" @click="activePage = 'transactionhistory'">
               Transactions
             </button>

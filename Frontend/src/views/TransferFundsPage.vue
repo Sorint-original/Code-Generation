@@ -126,7 +126,6 @@ async function transferFunds() {
 
 <style scoped>
 .transfer-page {
-  background: linear-gradient(to right, #93FB9D, #09C7FB);
   padding: 20px;
 }
 .transfer-card {

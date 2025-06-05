@@ -2,6 +2,8 @@ package com.bankapp.Backend.controller;
 
 import com.bankapp.Backend.DTO.ChangeDailyLimitRequest;
 import com.bankapp.Backend.DTO.ChangeDailyLimitResponse;
+import com.bankapp.Backend.exception.ResourceNotFoundException;
+import com.bankapp.Backend.exception.UserNotFoundException;
 import com.bankapp.Backend.model.BankAccount;
 import com.bankapp.Backend.model.CustomerStatus;
 import com.bankapp.Backend.model.Role;
@@ -21,27 +23,25 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
 
+@RestController
 @RequestMapping("/api/employee")
 @PreAuthorize("hasRole('EMPLOYEE')")
-
 public class EmployeeController {
 
     private final UserService userService;
     private final EmployeeService employeeService;
-
     private final TransactionService transactionService;
     private final BankAccountService bankAccountService;
   
 
 
     public EmployeeController(UserService userService, EmployeeService employeeService, TransactionService transactionService, BankAccountService bankAccountService) {
+
         this.userService = userService;
         this.employeeService = employeeService;
         this.transactionService = transactionService;
         this.bankAccountService = bankAccountService;
-
     }
 
     @GetMapping("/unapproved-customers")
@@ -50,31 +50,30 @@ public class EmployeeController {
     }
 
     @GetMapping("/user/{id}")
-    public ResponseEntity<?> getUserById(@PathVariable Long id) {
+    public ResponseEntity<User> getUserById(@PathVariable Long id) {
         User user = userService.findById(id);
-
         if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+            throw new UserNotFoundException(id);
         }
-
         return ResponseEntity.ok(user);
     }
 
-
     @PostMapping("/customers/{id}/approve")
-    public ResponseEntity<?> approveCustomer(@PathVariable Long id) {
+    public ResponseEntity<String> approveCustomer(@PathVariable Long id) {
         User user = userService.findById(id);
+        if (user == null) {
+            throw new UserNotFoundException(id);
+        }
+
         employeeService.approveCustomer(user);
         return ResponseEntity.ok("Customer approved and accounts created.");
-        //hello
     }
 
     @PostMapping("/customers/{id}/decline")
-    public ResponseEntity<?> declineCustomerStatus(@PathVariable Long id) {
-
+    public ResponseEntity<String> declineCustomerStatus(@PathVariable Long id) {
         User user = userService.findById(id);
         if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+            throw new UserNotFoundException(id);
         }
 
         employeeService.updateUserStatus(user, CustomerStatus.Denied);
@@ -112,5 +111,6 @@ public class EmployeeController {
     public ResponseEntity<Void> transferFunds(@RequestBody TransactionRequest transactionRequest) {
         transactionService.transferFundsEmployee(transactionRequest);
         return ResponseEntity.ok().build();
+
     }
 }

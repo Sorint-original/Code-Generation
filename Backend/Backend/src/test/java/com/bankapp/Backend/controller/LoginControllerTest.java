@@ -2,93 +2,90 @@ package com.bankapp.Backend.controller;
 
 import com.bankapp.Backend.DTO.LoginRequest;
 import com.bankapp.Backend.DTO.LoginResponse;
-import com.bankapp.Backend.model.Role;
-import com.bankapp.Backend.model.User;
-import com.bankapp.Backend.repository.UserRepository;
-import com.bankapp.Backend.security.JwtProvider;
+import com.bankapp.Backend.exception.GlobalExceptionHandler;
+import com.bankapp.Backend.service.LoginService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
+import org.mockito.Mockito;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 public class LoginControllerTest {
 
-    @InjectMocks
-    private LoginController loginController;
-
-    @Mock
-    private AuthenticationManager authenticationManager;
-
-    @Mock
-    private JwtProvider jwtProvider;
-
-    @Mock
-    private UserRepository userRepository;
-
-    @Mock
-    private Authentication authentication;
+    private MockMvc mockMvc;
+    private LoginService loginService;
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        loginService = mock(LoginService.class);
+        LoginController loginController = new LoginController(loginService);
+        objectMapper = new ObjectMapper();
+
+        mockMvc = MockMvcBuilders
+                .standaloneSetup(loginController)
+                .setControllerAdvice(new GlobalExceptionHandler())
+                .build();
     }
 
     @Test
-    public void testSuccessfulLogin() {
-        // Given
-        String email = "test@example.com";
-        String password = "password123";
-        String token = "fake-jwt-token";
+    void login_validCredentials_returnsToken() throws Exception {
+        String email = "user@example.com";
+        String password = "pass";
+        String token = "mocked-jwt";
 
-        LoginRequest loginRequest = new LoginRequest(email, password);
+        when(loginService.authenticateAndGenerateToken(email, password)).thenReturn(token);
 
-        User user = new User();
-        user.setEmail(email);
-        user.setRole(Role.CUSTOMER);
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setEmail(email);
+        loginRequest.setPassword(password);
 
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-                .thenReturn(authentication);
-
-        when(userRepository.findUserByEmail(email))
-                .thenReturn(Optional.of(user));
-
-        when(jwtProvider.generateToken(user))
-                .thenReturn(token);
-
-        // When
-        ResponseEntity<LoginResponse> response = loginController.login(loginRequest);
-
-        // Then
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals(token, response.getBody().getToken());
+        mockMvc.perform(post("/api/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.token").value(token));
     }
 
     @Test
-    public void testLogin_UserNotFound() {
-        // Given
-        String email = "missing@example.com";
-        String password = "irrelevant";
+    void login_userNotFound_returnsUnauthorized() throws Exception {
+        LoginRequest request = new LoginRequest();
+        request.setEmail("notfound@example.com");
+        request.setPassword("anyPassword");
 
-        LoginRequest loginRequest = new LoginRequest(email, password);
+        when(loginService.authenticateAndGenerateToken(anyString(), anyString()))
+                .thenThrow(new UsernameNotFoundException("User not found"));
 
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-                .thenReturn(authentication);
+        mockMvc.perform(post("/api/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isUnauthorized());
+    }
 
-        when(userRepository.findUserByEmail(email))
-                .thenReturn(Optional.empty());
+    @Test
+    void login_missingEmail_returnsBadRequest() throws Exception {
+        String json = "{ \"password\": \"pass\" }";
 
-        // Then
-        assertThrows(UsernameNotFoundException.class, () -> {
-            loginController.login(loginRequest);
-        });
+        mockMvc.perform(post("/api/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void login_missingPassword_returnsBadRequest() throws Exception {
+        String json = "{ \"email\": \"user@example.com\" }";
+
+        mockMvc.perform(post("/api/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isBadRequest());
     }
 }

@@ -2,11 +2,10 @@ package com.bankapp.Backend.service;
 
 import com.bankapp.Backend.DTO.AccountInfoResponse;
 import com.bankapp.Backend.DTO.BankAccountResponse;
+import com.bankapp.Backend.exception.*;
 import com.bankapp.Backend.model.*;
 import com.bankapp.Backend.repository.BankAccountRepository;
-import com.bankapp.Backend.repository.UserRepository;
 import com.bankapp.Backend.security.MyUserDetails;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -27,21 +26,19 @@ public class BankAccountService {
         this.ibanGenerator = new IBANGenerator();
     }
 
-    public Optional<BankAccount> GetBankAccount(String iban) {
-       return bankAccountRepository.findByIban(iban);
+    public BankAccount GetBankAccount(String iban) {
+        return bankAccountRepository.findByIban(iban)
+                .orElseThrow(() -> new AccountNotFoundException("Account with IBAN " + iban + " not found."));
     }
 
     public void approveCustomer(User user) {
-
         if (user.getRole() != Role.CUSTOMER) {
-            throw new IllegalArgumentException("Only customers can be approved.");
+            throw new InvalidUserRoleException("Only customers can be approved.");
         }
 
         if (!user.getBankAccounts().isEmpty()) {
-            throw new IllegalStateException("Customer already has accounts.");
+            throw new AccountAlreadyExistsException("Customer already has existing accounts.");
         }
-
-
 
         BankAccount checking = new BankAccount(user, AccountType.CHECKING, ibanGenerator.generateDutchIBAN());
         BankAccount savings = new BankAccount(user, AccountType.SAVINGS, ibanGenerator.generateDutchIBAN());
@@ -49,6 +46,7 @@ public class BankAccountService {
         bankAccountRepository.save(checking);
         bankAccountRepository.save(savings);
     }
+
     public void changeDailyLimit(BankAccount bankAccount, BigDecimal newLimit) {
         bankAccountRepository.updateDailyLimitByIban(bankAccount.getIban(), newLimit);
     }
@@ -62,18 +60,20 @@ public class BankAccountService {
     }
 
     public void updateAccountStatus(String iban, AccountStatus status) {
+        if (!bankAccountRepository.existsByIban(iban)) {
+            throw new AccountNotFoundException("Cannot update status. Account with IBAN " + iban + " not found.");
+        }
         bankAccountRepository.updateStatusByIban(iban, status);
     }
 
     public Long getCurrentUserId() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (auth != null && auth.isAuthenticated()) {
-            MyUserDetails userDetails = (MyUserDetails) auth.getPrincipal();
-            return userDetails.getUserId();
+        if (auth != null && auth.isAuthenticated() && auth.getPrincipal() instanceof MyUserDetails) {
+            return ((MyUserDetails) auth.getPrincipal()).getUserId();
         }
 
-        throw new RuntimeException("Unauthorized");
+        throw new UnauthorizedActionException("You must be logged in to perform this action.");
     }
 
     public List<BankAccountResponse> accountsToResponses(List<BankAccount> accounts) {
@@ -106,3 +106,4 @@ public class BankAccountService {
         return response;
     }
 }
+

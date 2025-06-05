@@ -65,9 +65,11 @@ export default {
         if (role === "EMPLOYEE") {
           this.router.push("/employee");
         } else {
-          this.router.push("/");
-            }
-        
+          this.router.push('/account');
+        }
+
+
+
       } catch (error) {
         if (error.response && error.response.data) {
           this.errorMessages =

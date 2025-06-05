@@ -6,7 +6,7 @@ import RegisterPage from "../views/RegisterPage.vue";
 import TestPage from "../views/Testpage.vue";
 import TransactionForm from "@/views/TransactionForm.vue";
 import UserTransactions from "../views/TransactionsList.vue";
-import EmployeeDashboard from "@/views/EmployeeDashboard.vue";
+import EmployeeDashboard from "../views/EmployeeDashboard.vue";
 import UnAuthorizedPage from "@/views/UnAuthorized.vue";
 import DailyLimitChangeForm from "@/views/DailyLimitChangeForm.vue";
 import AccountInfoPage from "@/views/AccountInfoPage.vue";

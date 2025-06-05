@@ -1,6 +1,7 @@
 <template>
   <div class="container-fluid min-vh-100 bg-light">
-    <h3>User Transactions</h3>
+    <h3 v-if="transactionSource === 'AllTransactions'">All Transactions</h3>
+    <h3 v-else >User Transactions</h3>
 
     <!-- Filter Section -->
     <div class="card mb-4">
@@ -89,7 +90,11 @@
   import api from '@/api/api';
 
  export default {
+
      name: 'TransactionHistory',
+     props: {
+       transactionSource: String // Declare the prop
+     },
      data() {
        return {
          transactions: [],
@@ -107,11 +112,23 @@
        };
      },
      methods: {
-       async fetchUserTransactions() {
+       async fetchLoggedTransactions() {
          this.loading = true;
          this.errorMessage = '';
          try {
            const response = await api.get('/transactionHistory/fetchLoggedUserTransactions');
+           this.transactions = response.data;
+         } catch (err) {
+           this.errorMessage = 'Failed to load transactions.';
+         } finally {
+           this.loading = false;
+         }
+       },
+       async fetchAllTransactions() {
+         this.loading = true;
+         this.errorMessage = '';
+         try {
+           const response = await api.get('/transactionHistory/fetchAllTransactions');
            this.transactions = response.data;
          } catch (err) {
            this.errorMessage = 'Failed to load transactions.';
@@ -177,7 +194,12 @@
        }
      },
      async mounted() {
-       await this.fetchUserTransactions();
+       if(!this.transactionSource){
+         await this.fetchLoggedTransactions();
+       }
+       else if(this.transactionSource==='AllTransactions'){
+         await this.fetchAllTransactions();
+       }
        this.applyFilters();
      }
    };

@@ -5,7 +5,7 @@ import Atm from "../views/Atm.vue";
 import RegisterPage from "../views/RegisterPage.vue";
 import TestPage from "../views/Testpage.vue";
 import TransactionForm from "@/views/TransactionForm.vue";
-import UserTransactions from "../views/UserTransactions.vue";
+import UserTransactions from "../views/TransactionsList.vue";
 import EmployeeDashboard from "@/views/EmployeeDashboard.vue";
 import UnAuthorizedPage from "@/views/UnAuthorized.vue";
 import DailyLimitChangeForm from "@/views/DailyLimitChangeForm.vue";

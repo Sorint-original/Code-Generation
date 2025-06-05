@@ -12,6 +12,8 @@ import DailyLimitChangeForm from "@/views/DailyLimitChangeForm.vue";
 import AccountInfoPage from "@/views/AccountInfoPage.vue";
 import AllAccountsPage from "@/views/AllAccountsPage.vue";
 import TransferFundsPage from "@/views/TransferFundsPage.vue";
+import ApproveCustomers from '../views/ApproveCustomers.vue';
+
 
 const routes = [
   { path: "/login", component: LoginPage },
@@ -33,6 +35,11 @@ const routes = [
     { path: "/account", component: AccountInfoPage },
     { path: "/account/all", component: AllAccountsPage },
     { path: "/transfer", component: TransferFundsPage },
+    {
+      path: '/employee/approve-customers',
+      name: 'ApproveCustomers',
+      component: ApproveCustomers
+    },
 
 ];
 

@@ -9,14 +9,17 @@
             <button class="btn w-100" :class="{ 'btn-primary': activePage === 'unapproved' }" @click="activePage = 'unapproved'">
               Approve Customers
             </button>
+          </li>
+          <li class="nav-item mb-2">
             <router-link to="/account/all" class="btn w-100 btn-primary">
               View All Accounts
             </router-link>
+          </li>
+          <li class="nav-item mb-2">
             <router-link to="/account" class="btn w-100 btn-primary">
               My Accounts
             </router-link>
           </li>
-          <!-- Add more nav items here later -->
           <li class="nav-item mb-2">
             <button class="btn w-100" :class="{ 'btn-primary': activePage === 'transactionhistory' }" @click="activePage = 'transactionhistory'">
               Transactions
@@ -28,45 +31,13 @@
       <!-- Main Content -->
       <div class="col-md-9 p-4">
         <div v-if="activePage === 'unapproved'">
-          <h3>Unapproved Customers</h3>
-
-          <div v-if="loading" class="alert alert-info">Loading customers...</div>
-          <div v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
-          <div v-if="successMessage" class="alert alert-success">{{ successMessage }}</div>
-
-          <table v-if="customers.length" class="table table-hover mt-3">
-            <thead class="table-light">
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>BSN</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="customer in customers" :key="customer.id">
-                <td>{{ customer.firstName }} {{ customer.lastName }}</td>
-                <td>{{ customer.email }}</td>
-                <td>{{ customer.phoneNumber }}</td>
-                <td>{{ customer.bsnNumber }}</td>
-                <td>
-                  <button class="btn btn-success btn-sm" @click="approveCustomer(customer.id)">Approve</button>
-                  <button class="btn btn-danger btn-sm" @click="unapproveCustomer(customer.id)">Decline</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-
-          <p v-if="!loading && customers.length === 0">No unapproved customers.</p>
+          <ApproveCustomers />
         </div>
 
-        <div v-if="activePage === 'transactionhistory'">
-          <TransactionList
-              :transactionSource="'AllTransactions'"
-          />
+        <div v-else-if="activePage === 'transactionhistory'">
+          <TransactionList :transactionSource="'AllTransactions'" />
         </div>
-        <!-- Placeholder for future pages -->
+
         <div v-else>
           <p>Select a section from the sidebar.</p>
         </div>
@@ -76,59 +47,19 @@
 </template>
 
 <script>
-import api from '@/api/api';
 import TransactionList from '../views/TransactionsList.vue';
+import ApproveCustomers from './ApproveCustomers.vue';
 
 export default {
   name: 'EmployeeDashboard',
-  // Add the component to the components option
   components: {
-    TransactionList
+    TransactionList,
+    ApproveCustomers
   },
   data() {
     return {
-      activePage: 'unapproved',
-      customers: [],
-      loading: false,
-      errorMessage: '',
-      successMessage: ''
+      activePage: 'unapproved'
     };
-  },
-  methods: {
-    async fetchUnapprovedCustomers() {
-      this.loading = true;
-      this.errorMessage = '';
-      try {
-        const response = await api.get('/employee/unapproved-customers');
-        this.customers = response.data;
-      } catch (err) {
-        this.errorMessage = 'Failed to load customers.';
-      } finally {
-        this.loading = false;
-      }
-    },
-    async approveCustomer(id) {
-      try {
-        await api.post(`/employee/customers/${id}/approve`);
-        this.successMessage = 'Customer approved.';
-        this.customers = this.customers.filter(c => c.id !== id);
-      } catch (err) {
-        this.errorMessage = 'Failed to approve customer.';
-      }
-    },
-
-    async unapproveCustomer(id) {
-      try {
-        await api.post(`/employee/customers/${id}/decline`);
-        this.successMessage = 'Customer unapproved.';
-        this.customers = this.customers.filter(c => c.id !== id);
-      } catch (err) {
-        this.errorMessage = 'Failed to unapprove customer.';
-      }
-    }
-  },
-  async mounted() {
-    this.fetchUnapprovedCustomers();
   }
 };
 </script>

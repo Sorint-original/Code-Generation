@@ -84,7 +84,6 @@ public class EmployeeController {
     public ResponseEntity<ChangeDailyLimitResponse> changeDailyLimit(@RequestBody ChangeDailyLimitRequest request) {
         try {
             BankAccount bankAccount = bankAccountService.GetBankAccount(request.getIban());
-
             bankAccountService.changeDailyLimit(bankAccount, request.getDailyLimit());
             ChangeDailyLimitResponse response = new ChangeDailyLimitResponse(bankAccount, true, "Daily limit changes successfully");
             return ResponseEntity.ok().body(response);

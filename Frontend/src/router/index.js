@@ -17,8 +17,9 @@ import ApproveCustomers from '../views/ApproveCustomers.vue';
 const routes = [
   { path: "/login", component: LoginPage },
   { path: "/register", component: RegisterPage },
-  { path: '/transaction', component: TransactionForm, meta: {requiresAuth: true} },
+  { path: "/transaction", component: TransactionForm, meta: {requiresAuth: true} },
   { path: "/transaction-history", component: UserTransactions, meta: { requiresAuth: true } },
+  { path: ""}
   { path: "/daily-limit", component: DailyLimitChangeForm, meta: { requiresAuth: true } },
   {path: "/Atm", component: Atm },
 

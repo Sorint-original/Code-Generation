@@ -20,22 +20,27 @@
 
         <div class="mb-3">
           <label class="form-label">Recipient First Name</label>
-          <input v-model="recipientFirstName" type="text" class="form-control" required />
+          <input v-model="recipientFirstName" type="text" class="form-control" />
         </div>
 
         <div class="mb-3">
           <label class="form-label">Recipient Last Name</label>
-          <input v-model="recipientLastName" type="text" class="form-control" required />
+          <input v-model="recipientLastName" type="text" class="form-control" />
         </div>
 
         <div class="mb-3">
-          <label class="form-label">Select Recipient Account</label>
-          <select v-model="toIban" class="form-select mb-3">
-            <option disabled value="">-- Select IBAN --</option>
-            <option v-for="iban in recipientIbans" :key="iban.iban" :value="iban.iban">
+          <label class="form-label">Matching Recipient Accounts</label>
+          <div v-if="filteredResults.length">
+            <div 
+              v-for="iban in filteredResults" 
+              :key="iban.iban"
+              class="selectable-box border p-2 mb-2 rounded"
+              :class="{ 'selected': toIban === iban.iban }"
+              @click="selectIban(iban.iban)">
               {{ iban.type }} - {{ iban.iban }}
-            </option>
-          </select>
+            </div>
+          </div>
+          <p v-else class="text-muted">No results to show</p>
         </div>
 
         <div class="mb-3">
@@ -85,6 +90,14 @@ export default {
     userEmail() {
       const tokenPayload = JSON.parse(atob(useAuthStore().token.split('.')[1]));
       return tokenPayload.sub;
+    },
+    filteredResults() {
+      const first = this.recipientFirstName.replace(/[^a-zA-Z]/g, '').toLowerCase();
+      const last = this.recipientLastName.replace(/[^a-zA-Z]/g, '').toLowerCase();
+      if ((first.length >= 2 || last.length >= 2) && this.recipientIbans.length > 0) {
+        return this.recipientIbans;
+      }
+      return [];
     }
   },
   mounted() {
@@ -95,12 +108,12 @@ export default {
   methods: {
     async fetchUserIbans() {
       try {
-        const res = await api.get('/user/accounts');
-        res.data.forEach(account => {
-          this.userIbans[account.type] = account.iban;
+        const res = await api.get('/api/account/info');
+        res.data.accounts.forEach(account => {
+          this.userIbans[account.accountType] = account.iban;
         });
       } catch (err) {
-        this.errorMessage = 'Failed to load account IBANs';
+        this.errorMessage = 'Failed to load your IBANs';
       }
     },
     updateFromIban() {
@@ -114,8 +127,11 @@ export default {
         });
         this.recipientIbans = res.data;
       } catch (err) {
-        this.errorMessage = 'Recipient not found or no IBANs available';
+        this.recipientIbans = [];
       }
+    },
+    selectIban(iban) {
+      this.toIban = iban;
     },
     async submitTransfer() {
       this.errorMessage = '';
@@ -145,10 +161,11 @@ export default {
     }
   },
   watch: {
-    recipientLastName(newVal) {
-      if (this.recipientFirstName && newVal) {
-        this.fetchRecipientIbans();
-      }
+    recipientFirstName() {
+      this.triggerSearch();
+    },
+    recipientLastName() {
+      this.triggerSearch();
     }
   }
 };
@@ -157,5 +174,13 @@ export default {
 <style scoped>
 .transfer-page {
   background: linear-gradient(to right, #93FB9D, #09C7FB);
+}
+.selectable-box {
+  cursor: pointer;
+  transition: 0.2s;
+}
+.selectable-box:hover,
+.selected {
+  background-color: #d0f0ff;
 }
 </style>

@@ -14,7 +14,7 @@
 
           <div class="mb-3">
             <label class="form-label">From IBAN</label>
-            <input type="text" class="form-control" :value="fromIban" disabled />
+            <input type="text" class="form-control" :value="userIbans[selectedAccountType]" disabled />
           </div>
         </div>
 
@@ -68,7 +68,6 @@ export default {
   data() {
     return {
       selectedAccountType: '',
-      fromIban: '',
       toIban: '',
       amount: null,
       errorMessage: '',
@@ -116,9 +115,6 @@ export default {
         this.errorMessage = 'Failed to load your IBANs';
       }
     },
-    updateFromIban() {
-      this.fromIban = this.userIbans[this.selectedAccountType];
-    },
     async fetchRecipientIbans() {
       try {
         const res = await api.post('/customer/search-ibans', {
@@ -136,13 +132,14 @@ export default {
     async submitTransfer() {
       this.errorMessage = '';
       this.successMessage = '';
-      if (!this.fromIban || !this.toIban || !this.amount || this.amount <= 0) {
+      const fromIban = this.userIbans[this.selectedAccountType];
+      if (!fromIban || !this.toIban || !this.amount || this.amount <= 0) {
         this.errorMessage = 'All fields are required and amount must be greater than 0';
         return;
       }
       try {
         const payload = {
-          fromAccountIban: this.fromIban,
+          fromAccountIban: fromIban,
           toAccountIban: this.toIban,
           amount: this.amount,
           initiatorEmail: this.userEmail,

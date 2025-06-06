@@ -4,22 +4,24 @@ import LoginPage from "../views/LoginPage.vue";
 import Atm from "../views/Atm.vue";
 import RegisterPage from "../views/RegisterPage.vue";
 import TestPage from "../views/Testpage.vue";
-import TransactionForm from "@/views/TransactionForm.vue";
 import UserTransactions from "../views/UserTransactions.vue";
 import EmployeeDashboard from "@/views/EmployeeDashboard.vue";
-import DailyLimitChangeForm from "@/views/DailyLimitChangeForm.vue";
 import UnAuthorizedPage from "@/views/UnAuthorized.vue";
+import DailyLimitChangeForm from "@/views/DailyLimitChangeForm.vue";
 import AccountInfoPage from "@/views/AccountInfoPage.vue";
 import AllAccountsPage from "@/views/AllAccountsPage.vue";
 import TransferFundsPage from "@/views/TransferFundsPage.vue";
+import ApproveCustomers from '../views/ApproveCustomers.vue';
+
 
 const routes = [
   { path: "/login", component: LoginPage },
   { path: "/register", component: RegisterPage },
   { path: '/transaction', component: TransactionForm, meta: {requiresAuth: true} },
   { path: "/transaction-history", component: UserTransactions, meta: { requiresAuth: true } },
-  { path: "/change-limit", component: DailyLimitChangeForm, meta: { requiresAuth: true } },
+  { path: "/daily-limit", component: DailyLimitChangeForm, meta: { requiresAuth: true } },
   {path: "/Atm", component: Atm },
+
   { path: "/test", component: TestPage, meta: { requiresAuth: true } },
   {
     path: '/employee',

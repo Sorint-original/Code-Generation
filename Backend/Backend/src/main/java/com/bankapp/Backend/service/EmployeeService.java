@@ -1,6 +1,7 @@
 package com.bankapp.Backend.service;
 
-
+import com.bankapp.Backend.exception.InvalidUserRoleException;
+import com.bankapp.Backend.exception.UserAlreadyHasAccountException;
 import com.bankapp.Backend.model.*;
 import com.bankapp.Backend.repository.BankAccountRepository;
 import com.bankapp.Backend.repository.UserRepository;
@@ -13,7 +14,6 @@ public class EmployeeService {
     private final BankAccountRepository bankAccountRepository;
     private final IBANGenerator ibanGenerator;
 
-
     public EmployeeService(UserRepository userRepository, BankAccountRepository bankAccountRepository) {
         this.userRepository = userRepository;
         this.bankAccountRepository = bankAccountRepository;
@@ -21,21 +21,18 @@ public class EmployeeService {
     }
 
     public void approveCustomer(User user) {
-
         if (user.getRole() != Role.CUSTOMER) {
-            throw new IllegalArgumentException("Only customers can be approved.");
+            throw new InvalidUserRoleException("Only customers can be approved.");
         }
 
         if (!user.getBankAccounts().isEmpty()) {
-            throw new IllegalStateException("Customer already has accounts.");
+            throw new UserAlreadyHasAccountException();
         }
 
-
-
         userRepository.updateUserStatusById(user.getId(), CustomerStatus.Approved);
+
         BankAccount checking = new BankAccount(user, AccountType.CHECKING, ibanGenerator.generateDutchIBAN());
         BankAccount savings = new BankAccount(user, AccountType.SAVINGS, ibanGenerator.generateDutchIBAN());
-
 
         bankAccountRepository.save(checking);
         bankAccountRepository.save(savings);
@@ -44,6 +41,4 @@ public class EmployeeService {
     public void updateUserStatus(User user, CustomerStatus status) {
         userRepository.updateUserStatusById(user.getId(), status);
     }
-
-
 }

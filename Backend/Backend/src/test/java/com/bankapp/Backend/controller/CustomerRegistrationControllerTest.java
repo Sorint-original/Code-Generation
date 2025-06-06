@@ -7,7 +7,6 @@ import com.bankapp.Backend.model.Role;
 import com.bankapp.Backend.model.User;
 import com.bankapp.Backend.service.UserService;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.http.ResponseEntity;
 
 import static org.junit.jupiter.api.Assertions.*;

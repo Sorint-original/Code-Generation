@@ -9,17 +9,20 @@
             <button class="btn w-100" :class="{ 'btn-primary': activePage === 'unapproved' }" @click="activePage = 'unapproved'">
               Approve Customers
             </button>
-            <router-link to="/account/all" class="btn w-100 btn-primary">
-              View All Accounts
-            </router-link>
-            <router-link to="/account" class="btn w-100 btn-primary">
-              My Accounts
-            </router-link>
           </li>
-          <!-- Add more nav items here later -->
           <li class="nav-item mb-2">
             <button class="btn w-100" :class="{ 'btn-primary': activePage === 'transactionhistory' }" @click="activePage = 'transactionhistory'">
               Transactions
+            </button>
+          </li>
+          <li class="nav-item mb-2">
+            <button class="btn w-100" :class="{ 'btn-primary': activePage === 'allaccounts' }" @click="activePage = 'allaccounts'">
+              All Accounts
+            </button>
+          </li>
+          <li class="nav-item mb-2">
+            <button class="btn w-100" :class="{ 'btn-primary': activePage === 'transferfunds' }" @click="activePage = 'transferfunds'">
+              Transfer Funds
             </button>
           </li>
         </ul>
@@ -27,123 +30,23 @@
 
       <!-- Main Content -->
       <div class="col-md-9 p-4">
+        <div v-if="activePage === 'allaccounts'">
+          <AllAccounts />
+        </div>
+
+        <div v-if="activePage === 'transferfunds'">
+          <TransferFunds />
+        </div>
+        
         <div v-if="activePage === 'unapproved'">
-          <h3>Unapproved Customers</h3>
-
-          <div v-if="loading" class="alert alert-info">Loading customers...</div>
-          <div v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
-          <div v-if="successMessage" class="alert alert-success">{{ successMessage }}</div>
-
-          <table v-if="customers.length" class="table table-hover mt-3">
-            <thead class="table-light">
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>BSN</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="customer in customers" :key="customer.id">
-                <td>{{ customer.firstName }} {{ customer.lastName }}</td>
-                <td>{{ customer.email }}</td>
-                <td>{{ customer.phoneNumber }}</td>
-                <td>{{ customer.bsnNumber }}</td>
-                <td>
-                  <button class="btn btn-success btn-sm" @click="approveCustomer(customer.id)">Approve</button>
-                  <button class="btn btn-danger btn-sm" @click="unapproveCustomer(customer.id)">Decline</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-
-          <p v-if="!loading && customers.length === 0">No unapproved customers.</p>
+          <ApproveCustomers />
         </div>
 
-        <div v-if="activePage === 'transactionhistory'">
-          <h3>Transaction History</h3>
-          <!-- Filter Section -->
-          <div class="card mb-4">
-            <div class="card-body">
-              <h5 class="card-title">Filter Options</h5>
-              <div class="row g-3">
-                <!-- Date Range Filter -->
-                <div class="col-md-4">
-                  <label class="form-label">Start Date</label>
-                  <input type="date" class="form-control" v-model="filters.startDate">
-                </div>
-                <div class="col-md-4">
-                  <label class="form-label">End Date</label>
-                  <input type="date" class="form-control" v-model="filters.endDate">
-                </div>
-
-                <!-- Amount Filter -->
-                <div class="col-md-4">
-                  <label class="form-label">Amount</label>
-                  <div class="input-group">
-                    <select class="form-select" v-model="filters.amountOperator">
-                      <option value=">">Greater than</option>
-                      <option value="<">Less than</option>
-                      <option value="=">Equal to</option>
-                    </select>
-                    <input type="number" step="0.01" class="form-control" v-model="filters.amountValue" placeholder="Amount">
-                  </div>
-                </div>
-
-                <!-- IBAN Filter -->
-                <div class="col-md-6">
-                  <label class="form-label">IBAN (From/To Account)</label>
-                  <input type="text" class="form-control" v-model="filters.iban" placeholder="Enter IBAN">
-                </div>
-
-                <!-- Filter Button -->
-                <div class="col-md-6 d-flex align-items-end">
-                  <button class="btn btn-primary me-2" @click="applyFilters">
-                    <i class="bi bi-funnel-fill me-1"></i> Apply Filters
-                  </button>
-                  <button class="btn btn-outline-secondary" @click="resetFilters">
-                    <i class="bi bi-arrow-counterclockwise me-1"></i> Reset
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div v-if="loading" class="alert alert-info">Loading transactions...</div>
-          <div v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
-          <div v-if="successMessage" class="alert alert-success">{{ successMessage }}</div>
-
-          <table v-if="transactions.length" class="table table-hover mt-3">
-            <thead class="table-light">
-            <tr>
-              <th>Timestamp</th>
-              <th>From Account</th>
-              <th>To Account</th>
-              <th>Amount</th>
-              <th>Initiated By</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr v-for="transaction in filteredTransactions" :key="transaction.id">
-              <td>{{ formatDate(transaction.date) }}</td>
-              <td>{{ transaction.fromAccount.iban }}</td>
-              <td>{{ transaction.toAccount.iban }}</td>
-              <td :class="{'text-danger': transaction.amount < 0, 'text-success': transaction.amount > 0}">
-                {{ formatCurrency(transaction.amount) }}
-              </td>
-              <td>
-                {{ transaction.initiatingUser.userName }}
-                <span class="badge" :class="transaction.initiatingUser.role === 'EMPLOYEE' ? 'bg-info' : 'bg-secondary'">
-              {{ transaction.initiatingUser.role }}
-            </span>
-              </td>
-            </tr>
-            </tbody>
-          </table>
-          <p v-if="!loading && transactions.length === 0">No transactions found.</p>
-
+        <div v-else-if="activePage === 'transactionhistory'">
+          <TransactionList :transactionSource="'AllTransactions'" />
         </div>
+
+        
         <!-- Placeholder for future pages -->
         <div v-else>
           <p>Select a section from the sidebar.</p>
@@ -154,26 +57,23 @@
 </template>
 
 <script>
+import TransactionList from '../views/TransactionsList.vue';
+import ApproveCustomers from './ApproveCustomers.vue';
 import api from '@/api/api';
+import AllAccounts from '@/views/AllAccountsPage.vue';
+import TransferFunds from '@/views/TransferFundsPage.vue';
 
 export default {
   name: 'EmployeeDashboard',
+  components: {
+    TransactionList,
+    ApproveCustomers,
+    AllAccounts,
+    TransferFunds
+  },
   data() {
     return {
-      activePage: 'unapproved',
-      customers: [],
-      transactions: [],
-      filteredTransactions: [],
-      loading: false,
-      errorMessage: '',
-      successMessage: '',
-      filters: {
-        startDate: null,
-        endDate: null,
-        amountOperator: '>',
-        amountValue: null,
-        iban: null
-      }
+      activePage: 'unapproved'
     };
   },
   methods: {
@@ -198,6 +98,7 @@ export default {
         this.errorMessage = 'Failed to approve customer.';
       }
     },
+    
 
     async unapproveCustomer(id) {
       try {

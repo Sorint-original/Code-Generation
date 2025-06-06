@@ -25,9 +25,17 @@ public class TransactionHistoryController {
         this.transactionService = transactionService;
     }
 
+    // Code for the employee transaction record
+    @GetMapping("/fetchAllTransactions")
+    public ResponseEntity<List<Transaction>> getTransactionHistory() {
+        return ResponseEntity.ok(this.transactionService.fetchTransactionHistory());
+    }
+
+    //code for current user transactions
     @GetMapping("/fetchLoggedUserTransactions")
     public ResponseEntity<List<Transaction>> getUnapprovedCustomers() {
         long userId = userService.getCurrentUserId();
         return ResponseEntity.ok(transactionService.fetchUserTransactionHistory(userId));
     }
+
 }

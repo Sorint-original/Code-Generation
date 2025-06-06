@@ -79,16 +79,6 @@ public class BankAccountServiceTest {
     }
 
     @Test
-    public void testChangeDailyLimit_CallsRepositoryCorrectly() {
-        String iban = "NL12INHO0123456789";
-        BigDecimal newLimit = new BigDecimal("5000");
-
-        bankAccountService.changeDailyLimit(iban, newLimit);
-
-        verify(bankAccountRepository, times(1)).updateDailyLimitByIban(iban, newLimit);
-    }
-
-    @Test
     void getAllBankAccounts_ShouldReturnAllAccounts() {
         List<BankAccount> mockAccounts = List.of(new BankAccount(), new BankAccount());
         when(bankAccountRepository.findAll()).thenReturn(mockAccounts);

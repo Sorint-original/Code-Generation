@@ -55,15 +55,15 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import api from '@/api/api' // your axios instance
-import { useAuthStore } from '@/stores/authstore' // assumes you store userId here
+import api from '@/api/api' 
+import { useAuthStore } from '@/stores/authstore' 
 
 const accountInfo = ref(null)
 const loading = ref(true)
 const error = ref(null)
 
 const auth = useAuthStore()
-const userId = auth.userId // or however you store logged-in user ID
+const userId = auth.userId 
 
 const totalBalance = computed(() => {
   return accountInfo.value?.bankAccounts.reduce((sum, acc) => sum + acc.amount, 0) || 0

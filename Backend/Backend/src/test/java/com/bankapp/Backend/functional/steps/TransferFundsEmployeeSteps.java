@@ -16,7 +16,7 @@ public class TransferFundsEmployeeSteps {
 
     @Given("I am logged in as an employee for transferring funds")
     public void i_am_logged_in_as_an_employee_for_transferring_funds() throws Exception {
-        String email = "bob@example.com"; // Replace with a valid seeded employee
+        String email = "bob@example.com";
         String password = "secureaccess";
 
         String loginUrl = "http://localhost:8080/api/login";
@@ -39,7 +39,6 @@ public class TransferFundsEmployeeSteps {
         headers.setBearerAuth(employeeToken);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        // You should make sure these IBANs and user exist in your test DB
         String transferPayload = """
         {
           "fromAccountIban": "21345643211",

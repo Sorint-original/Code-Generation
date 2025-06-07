@@ -1,21 +1,21 @@
 package com.bankapp.Backend.functional.steps;
 
 import io.cucumber.java.en.*;
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class AllBankAccountsSteps {
+public class BlockAccountSteps {
+
     private final RestTemplate restTemplate = new RestTemplate();
     private ResponseEntity<String> response;
     private String employeeToken;
+    private String testIban = "2134564321";
 
-    @Given("I have the EMPLOYEE role")
-    public void i_have_the_employee_role() throws JSONException {
+    @Given("I am logged in as an employee to block accounts")
+    public void i_am_logged_in_as_an_employee_to_block_accounts() throws Exception {
         String email = "bob@example.com";
         String password = "secureaccess";
 
@@ -27,24 +27,26 @@ public class AllBankAccountsSteps {
         HttpEntity<String> entity = new HttpEntity<>(loginPayload, headers);
 
         ResponseEntity<String> loginResponse = restTemplate.postForEntity(loginUrl, entity, String.class);
-
         assertEquals(HttpStatus.OK, loginResponse.getStatusCode());
 
-        employeeToken = new JSONObject(loginResponse.getBody()).getString("token");
+        JSONObject body = new JSONObject(loginResponse.getBody());
+        employeeToken = body.getString("token");
     }
 
-    @When("I send a GET request to {string} to retrieve all accounts")
-    public void i_send_a_get_request_to_retrieve_all_accounts(String path) {
+    @When("I send a PUT request to block account with IBAN")
+    public void i_send_a_put_request_to_block_account_with_iban() {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(employeeToken);
 
         HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-        response = restTemplate.exchange("http://localhost:8080" + path, HttpMethod.GET, entity, String.class);
+        String url = "http://localhost:8080/api/employee/account/close/" + testIban;
+        response = restTemplate.exchange(url, HttpMethod.PUT, entity, String.class);
     }
 
-    @Then("I should receive a 200 OK response in showing all accounts")
-    public void i_should_receive_a_200_ok_response_with_all_accounts() {
+    @Then("I should receive a 200 OK response confirming account is blocked")
+    public void i_should_receive_a_200_ok_response_confirming_account_is_blocked() {
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 }
+

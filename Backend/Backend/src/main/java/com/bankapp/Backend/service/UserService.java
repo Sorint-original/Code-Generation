@@ -2,7 +2,10 @@ package com.bankapp.Backend.service;
 
 import com.bankapp.Backend.DTO.CustomerRegistrationRequest;
 import com.bankapp.Backend.DTO.CustomerRegistrationResponse;
+import com.bankapp.Backend.DTO.DashboardStatusResponse;
 import com.bankapp.Backend.exception.DuplicateFieldException;
+import com.bankapp.Backend.exception.ForbiddenActionException;
+import com.bankapp.Backend.exception.StatusNotFoundException;
 import com.bankapp.Backend.exception.UserNotFoundException;
 import com.bankapp.Backend.model.*;
 import com.bankapp.Backend.repository.UserRepository;
@@ -75,5 +78,17 @@ public class UserService {
 
     public long getCurrentUserId() {
         return AuthUtils.getCurrentUserId();
+    }
+
+    public DashboardStatusResponse getCustomerDashboardStatus() {
+        Long id = AuthUtils.getCurrentUserId();
+
+        CustomerStatus status = userRepository.findStatusById(id).orElseThrow(() -> new StatusNotFoundException("Status of user was not found"));
+
+        return switch (status) {
+            case Pending -> new DashboardStatusResponse("Your account is pending approval.");
+            case Denied -> new DashboardStatusResponse("Your account has been denied. Please contact support.");
+            case Approved -> new DashboardStatusResponse("Welcome to your dashboard!");
+        };
     }
 }

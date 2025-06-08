@@ -51,7 +51,7 @@ public class DataSeeder implements ApplicationRunner {
             user1.setPhoneNumber("0612345678");
             user1.setDateOfBirth(LocalDate.parse("1990-01-01"));
             user1.setBsnNumber("123456789");
-            user1.setStatus(CustomerStatus.Pending);
+            user1.setStatus(CustomerStatus.Approved);
 
             User user2 = new User();
             user2.setFirstName("Bob");
@@ -86,6 +86,18 @@ public class DataSeeder implements ApplicationRunner {
             user4.setPhoneNumber("06234589078096789");
             user4.setDateOfBirth(LocalDate.parse("1985-05-15"));
             user4.setBsnNumber("987654389080921");
+            user4.setStatus(CustomerStatus.Pending);
+
+            User user5 = new User();
+            user4.setFirstName("user5");
+            user4.setLastName("test");
+            user4.setUserName("user5");
+            user4.setEmail("user5@example.com");
+            user4.setPassword(bCryptPasswordEncoder.encode("secureaccess"));
+            user4.setRole(Role.CUSTOMER);
+            user4.setPhoneNumber("062345893443078096789");
+            user4.setDateOfBirth(LocalDate.parse("1985-05-15"));
+            user4.setBsnNumber("9876543894343080921");
             user4.setStatus(CustomerStatus.Pending);
 
 

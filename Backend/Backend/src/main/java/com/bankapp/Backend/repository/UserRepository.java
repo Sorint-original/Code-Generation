@@ -32,6 +32,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findAllByRoleAndStatus(Role role, CustomerStatus status);
 
+    @Query("SELECT u.status FROM User u WHERE u.id = :id")
+    Optional<CustomerStatus> findStatusById(@Param("id") Long id);
+
 
 
 }

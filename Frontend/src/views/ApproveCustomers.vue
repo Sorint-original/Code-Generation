@@ -23,7 +23,7 @@
           <td>{{ customer.phoneNumber }}</td>
           <td>{{ customer.bsnNumber }}</td>
           <td>
-            <button class="btn btn-success btn-sm" @click="approveCustomer(customer.id)">Approve</button>
+            <button class="btn btn-success btn-sm" @click="openApprovalModal(customer)">Approve</button>
             <button class="btn btn-danger btn-sm" @click="unapproveCustomer(customer.id)">Decline</button>
           </td>
         </tr>
@@ -31,6 +31,46 @@
     </table>
 
     <p v-if="!loading && customers.length === 0">No unapproved customers.</p>
+
+    <!-- ✅ Approval Modal -->
+    <div class="modal fade" id="approveModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Set Limits for Approval</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="dailyLimit" class="form-label">Daily Transfer Limit (€)</label>
+              <input
+                v-model.number="form.dailyLimit"
+                type="number"
+                class="form-control"
+                id="dailyLimit"
+                min="0"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="absoluteLimit" class="form-label">Absolute Transfer Limit (€)</label>
+              <input
+                v-model.number="form.absoluteLimit"
+                type="number"
+                class="form-control"
+                id="absoluteLimit"
+                min="0"
+              />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button class="btn btn-success" @click="submitApproval">Approve</button>
+          </div>
+              <div v-if="modalErrorMessage" class="alert alert-danger">{{ modalErrorMessage }}</div>
+
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -44,7 +84,13 @@ export default {
       customers: [],
       loading: false,
       errorMessage: '',
-      successMessage: ''
+      successMessage: '',
+      modalErrorMessage: '',
+      form: {
+        selectedCustomerId: null,
+        dailyLimit: null,
+        absoluteLimit: null
+      }
     };
   },
   methods: {
@@ -55,37 +101,58 @@ export default {
         const response = await api.get('/employee/unapproved-customers');
         this.customers = response.data;
       } catch (error) {
-        if (error.response && error.response.data) {
-          this.errorMessage=
-            error.response.data.message || " Showing Unapproved customers failed. Please try again.";
+        if (error.response?.data?.message) {
+          this.errorMessage = error.response.data.message;
         } else {
-          this.errorMessages = "Network error. Please check your connection.";
-            }
+          this.errorMessage = 'Showing unapproved customers failed. Please try again.';
+        }
       } finally {
         this.loading = false;
       }
     },
-    async approveCustomer(id) {
+
+    openApprovalModal(customer) {
+      this.form.selectedCustomerId = customer.id;
+      this.form.dailyLimit = null;
+      this.form.absoluteLimit = null;
+
+      const modal = new bootstrap.Modal(document.getElementById('approveModal'));
+      modal.show();
+    },
+
+    async submitApproval() {
+      const { selectedCustomerId, dailyLimit, absoluteLimit } = this.form;
+
+      if (dailyLimit == null || absoluteLimit == null) {
+        this.modalErrorMessage = 'Please enter both daily and absolute limits.';
+        return;
+      }
+
       try {
-        await api.post(`/employee/customers/${id}/approve`);
+        await api.post(`/employee/customers/approve`, {
+          customerId: selectedCustomerId,
+          dailyTransferLimit: dailyLimit,
+          absoluteTransferLimit: absoluteLimit
+        });
+
         this.successMessage = 'Customer approved.';
-        this.customers = this.customers.filter(c => c.id !== id);
+        this.customers = this.customers.filter(c => c.id !== selectedCustomerId);
+        this.form = { selectedCustomerId: null, dailyLimit: null, absoluteLimit: null };
+
+        bootstrap.Modal.getInstance(document.getElementById('approveModal')).hide();
       } catch (error) {
-        if (error.response && error.response.data) {
-          this.errorMessage=
-            error.response.data.message || "Approving failed. Please try again.";
-        } else {
-          this.errorMessages = "Network error. Please check your connection.";
-            }
+        this.errorMessage = error.response?.data?.message || 'Approval failed. Please try again.';
+        this.modalErrorMessage = this.errorMessage;
       }
     },
+
     async unapproveCustomer(id) {
       try {
         await api.post(`/employee/customers/${id}/decline`);
-        this.successMessage = 'Customer unapproved.';
+        this.successMessage = 'Customer declined.';
         this.customers = this.customers.filter(c => c.id !== id);
       } catch (err) {
-        this.errorMessage = 'Failed to unapprove customer.';
+        this.errorMessage = 'Failed to decline customer.';
       }
     }
   },
@@ -94,3 +161,10 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.table th,
+.table td {
+  vertical-align: middle;
+}
+</style>

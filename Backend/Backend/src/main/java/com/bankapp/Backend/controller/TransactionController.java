@@ -1,29 +1,43 @@
 package com.bankapp.Backend.controller;
 
+import com.bankapp.Backend.DTO.RecipientAccount;
 import com.bankapp.Backend.DTO.TransactionRequest;
 import com.bankapp.Backend.service.TransactionService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Map;
+
 @RestController
-@RequestMapping("/api/transaction")
+@RequestMapping("/transaction")
 public class TransactionController {
 
-    private final TransactionService transactionrService;
+    private final TransactionService transactionService;
 
-    @Autowired
-    public TransactionController(TransactionService transactionrService) {
-        this.transactionrService = transactionrService;
+    public TransactionController(TransactionService transactionService) {
+        this.transactionService = transactionService;
     }
 
     @PostMapping
     public ResponseEntity<String> transferFunds(@RequestBody TransactionRequest request) {
         try {
-            transactionrService.transferFunds(request);
+            transactionService.transferFunds(request);
             return ResponseEntity.ok("✅ Transfer successful");
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body("❌ Error: " + request.getFromAccountIban() + " " + request.getToAccountIban() + " " + " " + request.getAmount() + e.getMessage());
+            return ResponseEntity.badRequest().body("❌ " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("⚠️ Unexpected error");
+        }
+    }
+
+    @PostMapping("/employee")
+    public ResponseEntity<String> transferFundsEmployee(@RequestBody TransactionRequest request) {
+        try {
+            transactionService.transferFundsEmployee(request);
+            return ResponseEntity.ok("✅ Employee transfer successful");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("❌ " + e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("⚠️ Unexpected error");
         }

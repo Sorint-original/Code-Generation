@@ -1,5 +1,6 @@
 package com.bankapp.Backend.service;
 
+import com.bankapp.Backend.DTO.RecipientAccount;
 import com.bankapp.Backend.DTO.TransactionRequest;
 import com.bankapp.Backend.model.*;
 import com.bankapp.Backend.repository.BankAccountRepository;
@@ -11,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
 @Service
 public class TransactionService {
@@ -19,9 +22,10 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final UserRepository userRepository;
 
-
     @Autowired
-    public TransactionService(BankAccountRepository bankAccountRepository, TransactionRepository transactionRepository, UserRepository userRepository) {
+    public TransactionService(BankAccountRepository bankAccountRepository,
+                              TransactionRepository transactionRepository,
+                              UserRepository userRepository) {
         this.bankAccountRepository = bankAccountRepository;
         this.transactionRepository = transactionRepository;
         this.userRepository = userRepository;
@@ -36,7 +40,6 @@ public class TransactionService {
         BankAccount to;
 
         if (initiator.getRole() == Role.CUSTOMER) {
-            // Enforce: Cannot transfer to same user
             from = getCustomerAccountByType(initiator, request.getAccountType());
             to = findAccountByIban(request.getToAccountIban(), "To account not found");
 
@@ -45,7 +48,6 @@ public class TransactionService {
             }
 
         } else if (initiator.getRole() == Role.EMPLOYEE) {
-            // Employee can enter any IBANs
             from = findAccountByIban(request.getFromAccountIban(), "From account not found");
             to = findAccountByIban(request.getToAccountIban(), "To account not found");
         } else {
@@ -66,13 +68,10 @@ public class TransactionService {
             validateTransfer(from, to, request.getAmount());
             performTransfer(from, to, request.getAmount());
             saveTransaction(from, to, request.getAmount(), userRepository.findUserByEmail(request.getInitiatorEmail()).get());
-        }
-        else {
-            throw new IllegalArgumentException("Cannot transfer to of from Saving account.");
+        } else {
+            throw new IllegalArgumentException("Cannot transfer to or from Saving account.");
         }
     }
-
-    // 🔍 Step 1: Find account by IBAN or throw error
     private BankAccount findAccountByIban(String iban, String errorMessage) {
         return bankAccountRepository.findByIban(iban)
                 .orElseThrow(() -> new IllegalArgumentException(errorMessage + ": " + iban));
@@ -84,7 +83,7 @@ public class TransactionService {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("No account of type " + type + " found for user."));
     }
-    // ✅ Step 2: Validate conditions
+
     private void validateTransfer(BankAccount from, BankAccount to, BigDecimal amount) {
         if (from.getIban().equals(to.getIban())) {
             throw new IllegalArgumentException("Cannot transfer to the same account.");
@@ -103,29 +102,23 @@ public class TransactionService {
         }
 
         BigDecimal totalToday = transactionRepository.getTotalTransferredToday(from);
-        BigDecimal dailyLimit = from.getDailyTransferLimit();
-
-        if (totalToday.add(amount).compareTo(dailyLimit) > 0) {
+        if (totalToday.add(amount).compareTo(from.getDailyTransferLimit()) > 0) {
             throw new IllegalArgumentException("Transfer exceeds daily limit. Already sent €" + totalToday + " today.");
         }
     }
 
-    // 💸 Step 3: Perform balance update
     private void performTransfer(BankAccount from, BankAccount to, BigDecimal amount) {
         from.setAmount(from.getAmount().subtract(amount));
         to.setAmount(to.getAmount().add(amount));
-
         bankAccountRepository.save(from);
         bankAccountRepository.save(to);
     }
 
-    // 🧾 Step 4: Save transaction record
     private void saveTransaction(BankAccount from, BankAccount to, BigDecimal amount, User initiator) {
         Transaction txn = new Transaction(from, to, amount, initiator);
         transactionRepository.save(txn);
     }
 
-    //Fetch transaction history
     public List<Transaction> fetchTransactionHistory() {
         return transactionRepository.findAllTransactions();
     }
@@ -133,5 +126,4 @@ public class TransactionService {
     public List<Transaction> fetchUserTransactionHistory(long userId) {
         return transactionRepository.findAllUserRelatedTransactions(userId);
     }
-
 }

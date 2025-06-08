@@ -1,6 +1,6 @@
 <template>
   <div class="transfer-page d-flex justify-content-center align-items-center vh-100">
-    <div class="card p-4 shadow-lg" style="width: 500px;">
+    <div class="card p-4 shadow-lg" style="width: 600px;">
       <h3 class="text-center mb-4">Transfer Funds</h3>
 
       <form @submit.prevent="submitTransfer">
@@ -14,33 +14,46 @@
 
           <div class="mb-3">
             <label class="form-label">From IBAN</label>
-            <input type="text" class="form-control" :value="userIbans[selectedAccountType]" disabled />
+            <input type="text" class="form-control" :value="fromIban" disabled />
           </div>
         </div>
 
         <div class="mb-3">
-          <label class="form-label">Recipient First Name</label>
-          <input v-model="recipientFirstName" type="text" class="form-control" />
+          <label class="form-label">Search Recipient (min 2 letters)</label>
+          <input v-model="recipientQuery" type="text" class="form-control" placeholder="Start typing name..." />
         </div>
 
-        <div class="mb-3">
-          <label class="form-label">Recipient Last Name</label>
-          <input v-model="recipientLastName" type="text" class="form-control" />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label">Matching Recipient Accounts</label>
-          <div v-if="filteredResults.length">
-            <div 
-              v-for="iban in filteredResults" 
-              :key="iban.iban"
-              class="selectable-box border p-2 mb-2 rounded"
-              :class="{ 'selected': toIban === iban.iban }"
-              @click="selectIban(iban.iban)">
-              {{ iban.type }} - {{ iban.iban }}
-            </div>
+        <div class="search-results-box mb-3">
+          <div v-if="recipientQuery.length < 2" class="text-muted text-center py-2">
+            No results to show
           </div>
-          <p v-else class="text-muted">No results to show</p>
+          <table v-else class="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>IBAN</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="recipient in recipientIbans"
+                :key="recipient.iban"
+                @click="selectRecipient(recipient)"
+                :class="{ 'table-active': recipient.iban === toIban }"
+                style="cursor: pointer;"
+              >
+                <td>{{ recipient.fullName }}</td>
+                <td>{{ recipient.accountType }}</td>
+                <td>{{ recipient.iban }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">To IBAN</label>
+          <input v-model="toIban" type="text" class="form-control" readonly />
         </div>
 
         <div class="mb-3">
@@ -68,17 +81,18 @@ export default {
   data() {
     return {
       selectedAccountType: '',
+      fromIban: '',
       toIban: '',
       amount: null,
       errorMessage: '',
       successMessage: '',
-      recipientFirstName: '',
-      recipientLastName: '',
+      recipientQuery: '',
       recipientIbans: [],
       userIbans: {
         CHECKING: '',
         SAVINGS: ''
       },
+      debounceTimeout: null,
     };
   },
   computed: {
@@ -89,14 +103,6 @@ export default {
     userEmail() {
       const tokenPayload = JSON.parse(atob(useAuthStore().token.split('.')[1]));
       return tokenPayload.sub;
-    },
-    filteredResults() {
-      const first = this.recipientFirstName.replace(/[^a-zA-Z]/g, '').toLowerCase();
-      const last = this.recipientLastName.replace(/[^a-zA-Z]/g, '').toLowerCase();
-      if ((first.length >= 2 || last.length >= 2) && this.recipientIbans.length > 0) {
-        return this.recipientIbans;
-      }
-      return [];
     }
   },
   mounted() {
@@ -108,38 +114,45 @@ export default {
     async fetchUserIbans() {
       try {
         const res = await api.get('/api/account/info');
-        res.data.accounts.forEach(account => {
+        res.data.bankAccounts.forEach(account => {
           this.userIbans[account.accountType] = account.iban;
         });
       } catch (err) {
-        this.errorMessage = 'Failed to load your IBANs';
+        this.errorMessage = 'Failed to load account IBANs';
       }
     },
+    updateFromIban() {
+      this.fromIban = this.userIbans[this.selectedAccountType];
+    },
     async fetchRecipientIbans() {
+      if (this.recipientQuery.length < 2) {
+        this.recipientIbans = [];
+        return;
+      }
+
       try {
-        const res = await api.post('/customer/search-ibans', {
-          firstName: this.recipientFirstName,
-          lastName: this.recipientLastName
+        const res = await api.post('/customer/search', {
+          query: this.recipientQuery
         });
         this.recipientIbans = res.data;
       } catch (err) {
         this.recipientIbans = [];
+        this.errorMessage = 'Error searching recipients.';
       }
     },
-    selectIban(iban) {
-      this.toIban = iban;
+    selectRecipient(recipient) {
+      this.toIban = recipient.iban;
     },
     async submitTransfer() {
       this.errorMessage = '';
       this.successMessage = '';
-      const fromIban = this.userIbans[this.selectedAccountType];
-      if (!fromIban || !this.toIban || !this.amount || this.amount <= 0) {
+      if (!this.fromIban || !this.toIban || !this.amount || this.amount <= 0) {
         this.errorMessage = 'All fields are required and amount must be greater than 0';
         return;
       }
       try {
         const payload = {
-          fromAccountIban: fromIban,
+          fromAccountIban: this.fromIban,
           toAccountIban: this.toIban,
           amount: this.amount,
           initiatorEmail: this.userEmail,
@@ -150,19 +163,18 @@ export default {
         this.toIban = '';
         this.amount = null;
         this.recipientIbans = [];
-        this.recipientFirstName = '';
-        this.recipientLastName = '';
+        this.recipientQuery = '';
       } catch (err) {
         this.errorMessage = err.response?.data || 'Transfer failed. Please try again.';
       }
     }
   },
   watch: {
-    recipientFirstName() {
-      this.triggerSearch();
-    },
-    recipientLastName() {
-      this.triggerSearch();
+    recipientQuery(newVal) {
+      clearTimeout(this.debounceTimeout);
+      this.debounceTimeout = setTimeout(() => {
+        this.fetchRecipientIbans();
+      }, 300);
     }
   }
 };
@@ -172,12 +184,14 @@ export default {
 .transfer-page {
   background: linear-gradient(to right, #93FB9D, #09C7FB);
 }
-.selectable-box {
-  cursor: pointer;
-  transition: 0.2s;
+
+.search-results-box {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
-.selectable-box:hover,
-.selected {
-  background-color: #d0f0ff;
+.search-results-box table {
+  margin: 0;
 }
 </style>

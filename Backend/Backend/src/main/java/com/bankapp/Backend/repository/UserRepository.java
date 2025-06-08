@@ -32,6 +32,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findAllByRoleAndStatus(Role role, CustomerStatus status);
 
+    @Query("SELECT u FROM User u WHERE " +
+            "LOWER(u.firstName) LIKE LOWER(CONCAT('%', :query, '%')) " +
+            "OR LOWER(u.lastName) LIKE LOWER(CONCAT('%', :query, '%'))")
+    List<User> searchUsersByName(@Param("query") String query);
 
 
 }

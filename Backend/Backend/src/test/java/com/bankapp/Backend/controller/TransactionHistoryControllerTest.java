@@ -1,6 +1,7 @@
 package com.bankapp.Backend.controller;
 
 import com.bankapp.Backend.model.Transaction;
+import com.bankapp.Backend.model.User;
 import com.bankapp.Backend.service.TransactionService;
 import com.bankapp.Backend.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -70,13 +71,16 @@ class TransactionHistoryControllerTest {
     @Test
     void getLoggedUserTransactions_ReturnsUserTransactions() throws Exception {
         // Arrange
-        long userId = 1L;
+        User testUser = new User();
+        testUser.setId(1L);
         Transaction t1 = new Transaction();
         Transaction t2 = new Transaction();
+        t1.setInitiatingUser(testUser);
+        t2.setInitiatingUser(testUser);
         List<Transaction> userTransactions = Arrays.asList(t1, t2);
 
-        when(userService.getCurrentUserId()).thenReturn(userId);
-        when(transactionService.fetchUserTransactionHistory(userId)).thenReturn(userTransactions);
+        when(userService.getCurrentUserId()).thenReturn(testUser.getId());
+        when(transactionService.fetchUserTransactionHistory(testUser.getId())).thenReturn(userTransactions);
 
         // Act & Assert
         mockMvc.perform(get("/api/transactionHistory/fetchLoggedUserTransactions"))
@@ -84,16 +88,17 @@ class TransactionHistoryControllerTest {
                 .andExpect(jsonPath("$.length()").value(2));
 
         verify(userService, times(1)).getCurrentUserId();
-        verify(transactionService, times(1)).fetchUserTransactionHistory(userId);
+        verify(transactionService, times(1)).fetchUserTransactionHistory(testUser.getId());
     }
 
     @Test
     void getLoggedUserTransactions_ReturnsEmptyList() throws Exception {
         // Arrange
-        long userId = 1L;
+        User testUser = new User();
+        testUser.setId(1L);
 
-        when(userService.getCurrentUserId()).thenReturn(userId);
-        when(transactionService.fetchUserTransactionHistory(userId)).thenReturn(Collections.emptyList());
+        when(userService.getCurrentUserId()).thenReturn(testUser.getId());
+        when(transactionService.fetchUserTransactionHistory(testUser.getId())).thenReturn(Collections.emptyList());
 
         // Act & Assert
         mockMvc.perform(get("/api/transactionHistory/fetchLoggedUserTransactions"))

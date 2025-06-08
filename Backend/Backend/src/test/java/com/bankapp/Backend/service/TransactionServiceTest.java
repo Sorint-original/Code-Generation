@@ -14,6 +14,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.*;
@@ -65,14 +67,14 @@ class TransactionServiceTest {
         fromAccount.setStatus(AccountStatus.APPROVED);
 
         toAccount = new BankAccount();
-        fromAccount.setId(100L);
-        fromAccount.setUser(testUser);
-        fromAccount.setAmount(BigDecimal.valueOf(500));
-        fromAccount.setType(AccountType.CHECKING);
-        fromAccount.setIban("TO456");
-        fromAccount.setAbsoluteTransferLimit(BigDecimal.valueOf(1000));
-        fromAccount.setDailyTransferLimit(BigDecimal.valueOf(500));
-        fromAccount.setStatus(AccountStatus.APPROVED);
+        toAccount.setId(101L);
+        toAccount.setUser(testUser);
+        toAccount.setAmount(BigDecimal.valueOf(500));
+        toAccount.setType(AccountType.SAVINGS);
+        toAccount.setIban("TO456");
+        toAccount.setAbsoluteTransferLimit(BigDecimal.valueOf(1000));
+        toAccount.setDailyTransferLimit(BigDecimal.valueOf(500));
+        toAccount.setStatus(AccountStatus.APPROVED);
     }
 
     @Test
@@ -147,6 +149,35 @@ class TransactionServiceTest {
         );
 
         assertEquals("Cannot transfer to of from Saving account.", ex.getMessage());
+    }
+
+    @Test
+    void fetchTransactionHistory_ReturnsAllTransactions() {
+        when(transactionRepository.findAllTransactions())
+                .thenReturn(List.of(new Transaction(), new Transaction()));
+
+        List<Transaction> result = transactionService.fetchTransactionHistory();
+
+        assertEquals(2, result.size());
+        verify(transactionRepository, times(1)).findAllTransactions();
+    }
+
+    @Test
+    void fetchUserTransactionHistory_ReturnsOnlyUserTransactions() {
+        long userId = testUser.getId();
+        Transaction t1 = new Transaction();
+        Transaction t2 = new Transaction();
+        t1.setInitiatingUser(testUser);
+        t2.setInitiatingUser(testUser);
+
+        when(transactionRepository.findAllUserRelatedTransactions(userId))
+                .thenReturn(Arrays.asList(t1, t2));
+
+        List<Transaction> result = transactionService.fetchUserTransactionHistory(userId);
+
+        assertEquals(2, result.size());
+        verify(transactionRepository, times(1))
+                .findAllUserRelatedTransactions(userId);
     }
 }
 

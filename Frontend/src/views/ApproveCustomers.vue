@@ -54,8 +54,13 @@ export default {
       try {
         const response = await api.get('/employee/unapproved-customers');
         this.customers = response.data;
-      } catch (err) {
-        this.errorMessage = 'Failed to load customers.';
+      } catch (error) {
+        if (error.response && error.response.data) {
+          this.errorMessage=
+            error.response.data.message || " Showing Unapproved customers failed. Please try again.";
+        } else {
+          this.errorMessages = "Network error. Please check your connection.";
+            }
       } finally {
         this.loading = false;
       }
@@ -65,8 +70,13 @@ export default {
         await api.post(`/employee/customers/${id}/approve`);
         this.successMessage = 'Customer approved.';
         this.customers = this.customers.filter(c => c.id !== id);
-      } catch (err) {
-        this.errorMessage = 'Failed to approve customer.';
+      } catch (error) {
+        if (error.response && error.response.data) {
+          this.errorMessage=
+            error.response.data.message || "Approving failed. Please try again.";
+        } else {
+          this.errorMessages = "Network error. Please check your connection.";
+            }
       }
     },
     async unapproveCustomer(id) {

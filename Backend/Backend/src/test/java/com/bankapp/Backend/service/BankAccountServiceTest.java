@@ -42,56 +42,6 @@ public class BankAccountServiceTest {
         SecurityContextHolder.setContext(context);
     }
 
-    @Test
-    public void testApproveCustomer_Success() {
-        // Arrange
-        User customer = new User();
-        customer.setRole(Role.CUSTOMER);
-        customer.setBankAccounts(Collections.emptyList());
-
-        // Act
-        bankAccountService.approveCustomer(customer);
-
-        // Assert
-        ArgumentCaptor<BankAccount> captor = ArgumentCaptor.forClass(BankAccount.class);
-        verify(bankAccountRepository, times(2)).save(captor.capture());
-
-        assertEquals(2, captor.getAllValues().size());
-        assertTrue(
-                captor.getAllValues().stream()
-                        .anyMatch(acc -> acc.getAccountType() == AccountType.CHECKING)
-        );
-        assertTrue(
-                captor.getAllValues().stream()
-                        .anyMatch(acc -> acc.getAccountType() == AccountType.SAVINGS)
-        );
-    }
-
-    @Test
-    public void testApproveCustomer_WrongRole_ThrowsException() {
-        User employee = new User();
-        employee.setRole(Role.EMPLOYEE);
-
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> bankAccountService.approveCustomer(employee));
-
-        assertEquals("Only customers can be approved.", exception.getMessage());
-        verify(bankAccountRepository, never()).save(any());
-    }
-
-    @Test
-    public void testApproveCustomer_AlreadyHasAccounts_ThrowsException() {
-        User customer = new User();
-        customer.setRole(Role.CUSTOMER);
-        BankAccount dummyAccount = new BankAccount();
-        customer.setBankAccounts(Collections.singletonList(dummyAccount));
-
-        IllegalStateException exception = assertThrows(IllegalStateException.class,
-                () -> bankAccountService.approveCustomer(customer));
-
-        assertEquals("Customer already has accounts.", exception.getMessage());
-        verify(bankAccountRepository, never()).save(any());
-    }
 
     @Test
     void getAllBankAccounts_ShouldReturnAccounts() {

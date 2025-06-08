@@ -87,6 +87,12 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
+    @ExceptionHandler(InvalidTransferLimitException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidLimit(InvalidTransferLimitException ex) {
+        ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Invalid transfer limit", ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
 
 
 

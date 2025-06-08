@@ -1,7 +1,6 @@
 package com.bankapp.Backend.controller;
 
-import com.bankapp.Backend.DTO.ChangeDailyLimitRequest;
-import com.bankapp.Backend.DTO.ChangeDailyLimitResponse;
+import com.bankapp.Backend.DTO.*;
 import com.bankapp.Backend.exception.ResourceNotFoundException;
 import com.bankapp.Backend.exception.UserNotFoundException;
 import com.bankapp.Backend.model.BankAccount;
@@ -9,8 +8,6 @@ import com.bankapp.Backend.model.CustomerStatus;
 import com.bankapp.Backend.model.Role;
 import com.bankapp.Backend.model.Transaction;
 import com.bankapp.Backend.model.User;
-import com.bankapp.Backend.DTO.BankAccountResponse;
-import com.bankapp.Backend.DTO.TransactionRequest;
 import com.bankapp.Backend.model.*;
 import com.bankapp.Backend.service.BankAccountService;
 import com.bankapp.Backend.service.EmployeeService;
@@ -58,14 +55,14 @@ public class EmployeeController {
         return ResponseEntity.ok(user);
     }
 
-    @PostMapping("/customers/{id}/approve")
-    public ResponseEntity<String> approveCustomer(@PathVariable Long id) {
-        User user = userService.findById(id);
+    @PostMapping("/customers/approve")
+    public ResponseEntity<String> approveCustomer(@RequestBody ApproveCustomerRequest request) {
+        User user = userService.findById(request.getCustomerId());
         if (user == null) {
-            throw new UserNotFoundException(id);
+            throw new UserNotFoundException(request.getCustomerId());
         }
 
-        employeeService.approveCustomer(user);
+        employeeService.approveCustomer(user, request.getAbsoluteTransferLimit(), request.getDailyTransferLimit());
         return ResponseEntity.ok("Customer approved and accounts created.");
     }
 

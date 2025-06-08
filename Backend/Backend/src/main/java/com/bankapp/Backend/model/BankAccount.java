@@ -46,13 +46,13 @@ public class BankAccount {
         this.dailyTransferLimit = dailyTransferLimit;
         this.status = status;
     }
-    public BankAccount(User user, AccountType accountType, String iban) {
+    public BankAccount(User user, AccountType accountType, String iban, BigDecimal absoluteTransferLimit, BigDecimal dailyTransferLimit) {
         this.user = user;
         this.amount = BigDecimal.ZERO.setScale(2);
         this.type = accountType;
         this.iban = iban; //i have it not so i can set it later using the iban generator
-        this.absoluteTransferLimit = new BigDecimal("0.01");
-        this.dailyTransferLimit = new BigDecimal("1000.00");
+        this.absoluteTransferLimit = absoluteTransferLimit;
+        this.dailyTransferLimit = dailyTransferLimit;
         this.status = AccountStatus.APPROVED;
     }
 

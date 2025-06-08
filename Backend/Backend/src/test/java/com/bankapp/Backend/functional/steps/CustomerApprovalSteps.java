@@ -32,7 +32,6 @@ public class CustomerApprovalSteps {
         );
 
         assertEquals(HttpStatus.OK, loginResponse.getStatusCode());
-
         employeeToken = new JSONObject(loginResponse.getBody()).getString("token");
     }
 
@@ -53,19 +52,40 @@ public class CustomerApprovalSteps {
 
         JSONObject user = users.getJSONObject(0);
         customerId = user.getLong("id");
-        System.out.println("customerId: " + customerId);
+        System.out.println("Selected customerId: " + customerId);
     }
 
     @When("I send a POST request to {string} the customer")
-    public void i_send_a_post_request_to(String action) {
+    public void i_send_a_post_request_to(String action) throws JSONException {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(employeeToken);
+        headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<Void> entity = new HttpEntity<>(headers);
-        String endpoint = "http://localhost:8080/api/employee/customers/" + customerId + "/" + action;
+        String endpoint;
+        HttpEntity<?> requestEntity;
 
-        ResponseEntity<String> response = restTemplate.exchange(endpoint, HttpMethod.POST, entity, String.class);
+        if (action.equalsIgnoreCase("approve")) {
+            // Send JSON body with limits
+            JSONObject requestBody = new JSONObject();
+            requestBody.put("customerId", customerId);
+            requestBody.put("absoluteTransferLimit", 10000);
+            requestBody.put("dailyTransferLimit", 5000);
+
+            requestEntity = new HttpEntity<>(requestBody.toString(), headers);
+            endpoint = "http://localhost:8080/api/employee/customers/approve";
+
+        } else if (action.equalsIgnoreCase("decline")) {
+            // Send only headers; ID is part of the path
+            requestEntity = new HttpEntity<>(headers);
+            endpoint = "http://localhost:8080/api/employee/customers/" + customerId + "/decline";
+
+        } else {
+            throw new IllegalArgumentException("Unsupported action: " + action);
+        }
+
+        ResponseEntity<String> response = restTemplate.exchange(endpoint, HttpMethod.POST, requestEntity, String.class);
         latestStatus = (HttpStatus) response.getStatusCode();
+        assertTrue(latestStatus.is2xxSuccessful(), "Expected 2xx status, got: " + latestStatus);
     }
 
     @Then("the customer's status should be {string}")
@@ -77,13 +97,12 @@ public class CustomerApprovalSteps {
         String endpoint = "http://localhost:8080/api/employee/user/" + customerId;
 
         ResponseEntity<String> response = restTemplate.exchange(endpoint, HttpMethod.GET, entity, String.class);
-
         assertEquals(HttpStatus.OK, response.getStatusCode());
 
         JSONObject user = new JSONObject(response.getBody());
         String actualStatus = user.getString("status");
-        System.out.println("expected: " + expectedStatus + " actual: " + actualStatus);
 
+        System.out.println("Expected: " + expectedStatus + " | Actual: " + actualStatus);
         assertEquals(expectedStatus, actualStatus);
     }
 }

@@ -83,7 +83,5 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.account-page {
-  background: linear-gradient(to right, #93FB9D, #09C7FB);
-}
+
 </style>

@@ -83,7 +83,6 @@ const amount = ref(0)
 const successMessage = ref('')
 const errorMessage = ref('')
 
-// Extract user email from JWT token
 function getUserEmail() {
   const authStore = useAuthStore()
   const token = authStore.token
@@ -91,7 +90,7 @@ function getUserEmail() {
 
   try {
     const payload = JSON.parse(atob(token.split('.')[1]))
-    return payload.sub // Assuming 'sub' contains the email
+    return payload.sub
   } catch (e) {
     console.error('Failed to decode token:', e)
     return null

@@ -41,7 +41,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import api from '@/api/api' // your axios instance
+import api from '@/api/api'
 
 const accounts = ref([])
 const error = ref(null)
@@ -62,7 +62,6 @@ const closeAccount = async (iban) => {
     loadingIbans.value.push(iban)
     await api.put(`/employee/account/close/${iban}`)
 
-    // update local status
     const acc = accounts.value.find(a => a.iban === iban)
     if (acc) acc.status = 'BLOCKED'
   } catch (err) {

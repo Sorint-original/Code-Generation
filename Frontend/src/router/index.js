@@ -13,6 +13,7 @@ import AccountInfoPage from "@/views/AccountInfoPage.vue";
 import AllAccountsPage from "@/views/AllAccountsPage.vue";
 import TransferFundsPage from "@/views/TransferFundsPage.vue";
 import ApproveCustomers from '../views/ApproveCustomers.vue';
+import CustomerDashboard from "@/views/CustomerDashboard.vue";
 
 
 const routes = [
@@ -40,6 +41,7 @@ const routes = [
       name: 'ApproveCustomers',
       component: ApproveCustomers
     },
+    {path: '/customer/dashboard', component: CustomerDashboard, meta: { requiresAuth: true } },
 
 ];
 

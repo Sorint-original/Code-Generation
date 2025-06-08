@@ -65,7 +65,7 @@ export default {
         if (role === "EMPLOYEE") {
           this.router.push("/employee");
         } else {
-          this.router.push('/account');
+          this.router.push('/customer/dashboard');
         }
 
 

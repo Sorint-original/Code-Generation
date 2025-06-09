@@ -26,6 +26,11 @@
             </button>
           </li>
         </ul>
+        <hr />
+          <button class="btn btn-outline-danger w-100" v-on="{ click: logout }">
+            Logout
+          </button>
+     
       </div>
 
       <!-- Main Content -->
@@ -62,6 +67,8 @@ import ApproveCustomers from './ApproveCustomers.vue';
 import api from '@/api/api';
 import AllAccounts from '@/views/AllAccountsPage.vue';
 import TransferFunds from '@/views/TransferFundsPage.vue';
+import { useAuthStore } from '@/stores/authstore';
+
 
 export default {
   name: 'EmployeeDashboard',
@@ -77,6 +84,7 @@ export default {
     };
   },
   methods: {
+    
     async fetchUnapprovedCustomers() {
       this.loading = true;
       this.errorMessage = '';
@@ -97,6 +105,10 @@ export default {
       } catch (err) {
         this.errorMessage = 'Failed to approve customer.';
       }
+    },
+    logout() {
+      useAuthStore().logout();
+      this.$router.push('/login');
     },
     
 

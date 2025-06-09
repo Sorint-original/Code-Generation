@@ -6,6 +6,13 @@
 
     <!-- ✅ Approved Customer Dashboard -->
     <div v-else-if="statusMessage && isApproved" class="dashboard-content">
+      <!-- Logout Button -->
+      <div class="d-flex justify-content-end mb-3 me-3">
+        <button class="btn btn-outline-danger" v-on="{ click: logout }">
+          Logout
+        </button>
+      </div>
+
       <h2 class="mb-3 text-center">{{ statusMessage }}</h2>
 
       <!-- Navigation Tabs -->
@@ -80,6 +87,7 @@
 
 <script>
 import api from '@/api/api';
+import { useAuthStore } from '@/stores/authstore';
 import AccountInfo from './AccountInfoPage.vue';
 import TransactionHistory from './TransactionsList.vue';
 import TransactionForm from './TransactionForm.vue';
@@ -100,6 +108,10 @@ export default {
     };
   },
   methods: {
+    logout() {
+      useAuthStore().logout();
+      this.$router.push('/login');
+    },
     async fetchDashboardData() {
       try {
         const response = await api.get('/customer/dashboard');

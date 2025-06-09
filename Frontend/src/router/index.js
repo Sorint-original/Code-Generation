@@ -17,6 +17,7 @@ import CustomerDashboard from "@/views/CustomerDashboard.vue";
 
 
 const routes = [
+    { path: "/", redirect: "/login" },
   { path: "/login", component: LoginPage },
   { path: "/register", component: RegisterPage },
 

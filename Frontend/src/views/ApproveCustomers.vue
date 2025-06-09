@@ -136,6 +136,8 @@ export default {
         });
 
         this.successMessage = 'Customer approved.';
+        this.modalErrorMessage = '';
+        this.errorMessage = '';
         this.customers = this.customers.filter(c => c.id !== selectedCustomerId);
         this.form = { selectedCustomerId: null, dailyLimit: null, absoluteLimit: null };
 

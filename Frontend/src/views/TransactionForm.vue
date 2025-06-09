@@ -105,17 +105,13 @@ export default {
       return tokenPayload.sub;
     }
   },
-  mounted() {
-    if (this.isCustomer) {
-      this.fetchUserIbans();
-    }
-  },
+  
   methods: {
     async fetchUserIbans() {
       try {
-        const res = await api.get('/api/account/info');
+        const res = await api.get('/account/info'); // ✅ FIXED PATH
         res.data.bankAccounts.forEach(account => {
-          this.userIbans[account.accountType] = account.iban;
+          this.userIbans[account.type] = account.iban; // ✅ FIXED CASE
         });
       } catch (err) {
         this.errorMessage = 'Failed to load account IBANs';
@@ -168,6 +164,9 @@ export default {
         this.errorMessage = err.response?.data || 'Transfer failed. Please try again.';
       }
     }
+  },
+  mounted() {
+      this.fetchUserIbans();
   },
   watch: {
     recipientQuery(newVal) {

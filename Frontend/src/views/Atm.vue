@@ -1,58 +1,74 @@
 <script setup>
-  import { ref } from 'vue'
-  import api from '@/api/api';
+import { ref } from 'vue'
+import api from '@/api/api'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/authstore'
 
+const showButtons = ref(true)
+const withDrawButton = ref(false)
+const depositButton = ref(false)
+const amount = ref('')
 
-  const showButtons = ref(true)
-  const withDrawButton = ref(false)
-  const depositButton = ref(false)
-  const amount = ref('')
+const router = useRouter()
+const authStore = useAuthStore()
 
+function withdraw() {
+  showButtons.value = false
+  withDrawButton.value = true
+}
 
-  function withdraw() {
-    showButtons.value = false;
-    withDrawButton.value = true;
-  }
+function deposit() {
+  showButtons.value = false
+  depositButton.value = true
+}
 
-  function deposit(){
-    showButtons.value = false;
-    depositButton.value = true;
-  }
-
-  async function confirm() {
-      const payload = {
+async function confirm() {
+  const payload = {
     amount: amount.value
-  };
+  }
 
   try {
-    let response;
+    let response
 
     if (withDrawButton.value) {
-      response = await api.post('/atm/withdraw', payload);
+      response = await api.post('/atm/withdraw', payload)
     } else if (depositButton.value) {
-      response = await api.post('/atm/deposit', payload);
+      response = await api.post('/atm/deposit', payload)
     } else {
-      throw new Error("No transaction type selected.");
+      throw new Error('No transaction type selected.')
     }
 
-    alert(response.data);
+    alert(response.data)
   } catch (err) {
-    alert(err.response?.data || 'Transaction failed. Please try again.');
+    alert(err.response?.data || 'Transaction failed. Please try again.')
   }
 
   // Reset UI
-  amount.value = '';
-  showButtons.value = true;
-  withDrawButton.value = false;
-  depositButton.value = false;
+  amount.value = ''
+  showButtons.value = true
+  withDrawButton.value = false
+  depositButton.value = false
 }
 
+// ✅ Logout function
+function logout() {
+  authStore.logout()
+  router.push('/atm/login')
+}
 </script>
 
 <template>
   <div>
-    <img class="login-logo mx-auto d-block mb-4 w-25" src="../assets/img/May 14, 2025, 09_37_41 PM.png" alt="Banking App Logo">
+    <img class="login-logo mx-auto d-block mb-4 w-25" src="../assets/img/May 14, 2025, 09_37_41 PM.png" alt="Banking App Logo" />
   </div>
+
+  <!-- ✅ Logout button -->
+  <div class="text-center mb-4">
+    <button class="btn btn-danger px-4 py-2" @click="logout">
+      Logout
+    </button>
+  </div>
+
   <div class="screen d-flex justify-content-between" style="margin-top: 150px;">
     <template v-if="showButtons">
       <button
@@ -98,7 +114,6 @@
   </div>
 </template>
 
-
 <style scoped>
 html, body, #app {
   height: 100%;
@@ -110,4 +125,4 @@ html, body, #app {
 .screen {
   padding: 2rem;
 }
-</style> 
+</style>

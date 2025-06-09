@@ -25,13 +25,7 @@ public class EmployeeService {
 
     public void approveCustomer(User user, BigDecimal absoluteTransferLimit, BigDecimal dailyTransferLimit) {
 
-        if (absoluteTransferLimit == null || dailyTransferLimit == null) {
-            throw new InvalidTransferLimitException("Transfer limits cannot be null.");
-        }
-
-        if (absoluteTransferLimit.compareTo(BigDecimal.ZERO) < 0 || dailyTransferLimit.compareTo(BigDecimal.ZERO) < 0) {
-            throw new InvalidTransferLimitException("Transfer limits must be non-negative.");
-        }
+        validateLimitsForAproval(absoluteTransferLimit, dailyTransferLimit);
         if (user.getRole() != Role.CUSTOMER) {
             throw new InvalidUserRoleException("Only customers can be approved.");
         }
@@ -51,5 +45,19 @@ public class EmployeeService {
 
     public void updateUserStatus(User user, CustomerStatus status) {
         userRepository.updateUserStatusById(user.getId(), status);
+    }
+    private void validateLimitsForAproval(BigDecimal absoluteTransferLimit, BigDecimal dailyTransferLimit){
+        if (absoluteTransferLimit == null || dailyTransferLimit == null) {
+            throw new InvalidTransferLimitException("Transfer limits cannot be null.");
+        }
+
+        if (absoluteTransferLimit.compareTo(BigDecimal.ZERO) < 0 || dailyTransferLimit.compareTo(BigDecimal.ZERO) < 0) {
+            throw new InvalidTransferLimitException("Transfer limits must be non-negative.");
+        }
+
+        if (absoluteTransferLimit.compareTo(dailyTransferLimit) >= 0) {
+            throw new InvalidTransferLimitException("Absolute limit must be less than daily limit.");
+        }
+
     }
 }

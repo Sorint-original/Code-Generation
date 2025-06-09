@@ -124,4 +124,18 @@ class EmployeeServiceTest {
 
         verify(userRepository, times(1)).updateUserStatusById(6L, CustomerStatus.Denied);
     }
+    @Test
+    void approveCustomer_ShouldThrow_WhenAbsoluteLimitIsGreaterThanOrEqualToDaily() {
+        User user = new User();
+        user.setId(10L);
+        user.setRole(Role.CUSTOMER);
+        user.setBankAccounts(new ArrayList<>());
+
+        InvalidTransferLimitException ex = assertThrows(InvalidTransferLimitException.class, () ->
+                employeeService.approveCustomer(user, new BigDecimal("6000"), new BigDecimal("5000"))
+        );
+
+        assertEquals("Absolute limit must be less than daily limit.", ex.getMessage());
+    }
+
 }

@@ -6,7 +6,7 @@ import java.util.Random;
 public class IBANGenerator {
 
     private static final String COUNTRY_CODE = "NL";
-    private static final String BANK_CODE = "INBK"; // InBanking's bank code
+    private static final String BANK_CODE = "INBK";
     private final Random random = new Random();
 
     public String generateDutchIBAN() {
@@ -17,7 +17,7 @@ public class IBANGenerator {
     }
 
     private String generateRandomAccountNumber() {
-        long number = Math.abs(random.nextLong()) % 1_000_000_0000L; // Max 10 digits
+        long number = Math.abs(random.nextLong()) % 1_000_000_0000L;
         return String.format("%010d", number);
     }
 

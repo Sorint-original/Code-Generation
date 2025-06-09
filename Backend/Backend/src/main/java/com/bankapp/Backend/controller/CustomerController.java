@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-@RestController  // ✅ REQUIRED
+@RestController
 @RequestMapping("/api/customer")
 public class CustomerController {
 
@@ -34,6 +34,8 @@ public class CustomerController {
     public ResponseEntity<List<RecipientAccount>> searchRecipients(@RequestBody Map<String, String> body) {
         String query = body.get("query");
         return ResponseEntity.ok(customerService.searchRecipientAccounts(query));
+    }
+
     @GetMapping("/dashboard")
     public ResponseEntity<DashboardStatusResponse> getCustomerDashboardStatus() {
         DashboardStatusResponse response = userService.getCustomerDashboardStatus();

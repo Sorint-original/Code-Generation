@@ -161,7 +161,7 @@ export default {
         this.recipientIbans = [];
         this.recipientQuery = '';
       } catch (err) {
-        this.errorMessage = err.response?.data || 'Transfer failed. Please try again.';
+        this.errorMessage = err.response?.data.message || 'Transfer failed. Please try again.';
       }
     }
   },
@@ -180,10 +180,6 @@ export default {
 </script>
 
 <style scoped>
-.transfer-page {
-  background: linear-gradient(to right, #93FB9D, #09C7FB);
-}
-
 .search-results-box {
   max-height: 200px;
   overflow-y: auto;

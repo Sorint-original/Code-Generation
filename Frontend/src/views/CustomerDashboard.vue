@@ -28,11 +28,21 @@
             Transactions
           </button>
         </li>
+        <li class="nav-item">
+          <button
+            class="nav-link"
+            :class="{ active: activeTab === 'transfer' }"
+            @click="activeTab = 'transfer'"
+          >
+            Transfer
+          </button>
+        </li>
       </ul>
 
       <div class="tab-content">
         <AccountInfo v-if="activeTab === 'account'" />
         <TransactionHistory v-else-if="activeTab === 'transactions'" />
+        <TransactionForm v-else-if="activeTab === 'transfer'" />
       </div>
     </div>
 
@@ -72,12 +82,14 @@
 import api from '@/api/api';
 import AccountInfo from './AccountInfoPage.vue';
 import TransactionHistory from './TransactionsList.vue';
+import TransactionForm from './TransactionForm.vue';
 
 export default {
   name: 'CustomerDashboard',
   components: {
     AccountInfo,
     TransactionHistory,
+    TransactionForm,
   },
   data() {
     return {

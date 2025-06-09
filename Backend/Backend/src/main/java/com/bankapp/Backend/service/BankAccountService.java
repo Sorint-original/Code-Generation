@@ -32,8 +32,17 @@ public class BankAccountService {
     }
 
     public void changeDailyLimit(BankAccount bankAccount, BigDecimal newLimit) {
+        if (newLimit == null || newLimit.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new InvalidTransferLimitException("Daily limit must be greater than 0 and not null.");
+        }
+
+        if (bankAccount.getAbsoluteTransferLimit().compareTo(newLimit) >= 0) {
+            throw new InvalidTransferLimitException("Daily limit must be greater than the absolute transfer limit.");
+        }
+
         bankAccountRepository.updateDailyLimitByIban(bankAccount.getIban(), newLimit);
     }
+
 
     public List<BankAccount> getAllBankAccounts() {
         return bankAccountRepository.findAllBankAccounts();

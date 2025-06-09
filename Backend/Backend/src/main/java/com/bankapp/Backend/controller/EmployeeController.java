@@ -84,6 +84,7 @@ public class EmployeeController {
             bankAccountService.changeDailyLimit(bankAccount, request.getDailyLimit());
             ChangeDailyLimitResponse response = new ChangeDailyLimitResponse(bankAccount, true, "Daily limit changes successfully");
             return ResponseEntity.ok().body(response);
+
         } catch (Exception e) {
             ChangeDailyLimitResponse response = new ChangeDailyLimitResponse(null, false, e.getMessage() + "Failed to change daily limit");
             return ResponseEntity.badRequest().body(response);

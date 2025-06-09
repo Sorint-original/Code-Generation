@@ -2,6 +2,7 @@ package com.bankapp.Backend.service;
 
 import com.bankapp.Backend.DTO.RecipientAccount;
 import com.bankapp.Backend.DTO.TransactionRequest;
+import com.bankapp.Backend.exception.CustomerTransactionException;
 import com.bankapp.Backend.model.*;
 import com.bankapp.Backend.repository.BankAccountRepository;
 import com.bankapp.Backend.repository.TransactionRepository;
@@ -34,7 +35,7 @@ public class TransactionService {
     @Transactional
     public void transferFunds(TransactionRequest request) {
         User initiator = userRepository.findUserByEmail(request.getInitiatorEmail())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new CustomerTransactionException("User not found"));
 
         BankAccount from;
         BankAccount to;
@@ -44,14 +45,14 @@ public class TransactionService {
             to = findAccountByIban(request.getToAccountIban(), "To account not found");
 
             if (from.getIban().equals(to.getIban())) {
-                throw new IllegalArgumentException("Customer cannot transfer to their own account.");
+                throw new CustomerTransactionException("Customer cannot transfer to their own account.");
             }
 
         } else if (initiator.getRole() == Role.EMPLOYEE) {
             from = findAccountByIban(request.getFromAccountIban(), "From account not found");
             to = findAccountByIban(request.getToAccountIban(), "To account not found");
         } else {
-            throw new IllegalArgumentException("Unknown role.");
+            throw new CustomerTransactionException("Unknown role.");
         }
 
         validateTransfer(from, to, request.getAmount());
@@ -69,41 +70,42 @@ public class TransactionService {
             performTransfer(from, to, request.getAmount());
             saveTransaction(from, to, request.getAmount(), userRepository.findUserByEmail(request.getInitiatorEmail()).get());
         } else {
-            throw new IllegalArgumentException("Cannot transfer to or from Saving account.");
+            throw new CustomerTransactionException("Cannot transfer to or from Saving account.");
         }
     }
     private BankAccount findAccountByIban(String iban, String errorMessage) {
         return bankAccountRepository.findByIban(iban)
-                .orElseThrow(() -> new IllegalArgumentException(errorMessage + ": " + iban));
+                .orElseThrow(() -> new CustomerTransactionException(errorMessage + ": " + iban));
     }
 
     private BankAccount getCustomerAccountByType(User user, AccountType type) {
         return user.getBankAccounts().stream()
                 .filter(account -> account.getType() == type)
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("No account of type " + type + " found for user."));
+                .orElseThrow(() -> new CustomerTransactionException("No account of type " + type + " found for user."));
     }
 
     private void validateTransfer(BankAccount from, BankAccount to, BigDecimal amount) {
         if (from.getIban().equals(to.getIban())) {
-            throw new IllegalArgumentException("Cannot transfer to the same account.");
+            throw new CustomerTransactionException("Cannot transfer to the same account.");
         }
 
         if (amount.compareTo(new BigDecimal("0.01")) < 0) {
-            throw new IllegalArgumentException("Transfer amount must be at least €0.01.");
+            throw new CustomerTransactionException("Transfer amount must be at least €0.01.");
         }
 
         if (from.getAmount().compareTo(amount) < 0) {
-            throw new IllegalArgumentException("Insufficient funds.");
+            throw new CustomerTransactionException("Insufficient funds." +"You currently have: "+ from.getAmount()
+                    + " in your bank account.");
         }
 
-        if (amount.compareTo(from.getAbsoluteTransferLimit()) > 0) {
-            throw new IllegalArgumentException("Transfer exceeds absolute transfer limit.");
+        if (amount.compareTo(from.getAbsoluteTransferLimit()) < 0) {
+            throw new CustomerTransactionException("Transfer must exceed absolute transfer limit.");
         }
 
         BigDecimal totalToday = transactionRepository.getTotalTransferredToday(from);
         if (totalToday.add(amount).compareTo(from.getDailyTransferLimit()) > 0) {
-            throw new IllegalArgumentException("Transfer exceeds daily limit. Already sent €" + totalToday + " today.");
+            throw new CustomerTransactionException("Transfer exceeds daily limit. Already sent €" + totalToday + " today.");
         }
     }
 

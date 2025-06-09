@@ -2,6 +2,7 @@ package com.bankapp.Backend.controller;
 
 import com.bankapp.Backend.DTO.RecipientAccount;
 import com.bankapp.Backend.DTO.TransactionRequest;
+import com.bankapp.Backend.exception.CustomerTransactionException;
 import com.bankapp.Backend.service.TransactionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/transaction")
+@RequestMapping("/api/transaction")
 public class TransactionController {
 
     private final TransactionService transactionService;
@@ -21,14 +22,8 @@ public class TransactionController {
 
     @PostMapping
     public ResponseEntity<String> transferFunds(@RequestBody TransactionRequest request) {
-        try {
-            transactionService.transferFunds(request);
-            return ResponseEntity.ok("✅ Transfer successful");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body("❌ " + e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("⚠️ Unexpected error");
-        }
+        transactionService.transferFunds(request);
+        return ResponseEntity.ok("Transaction transferred successfully");
     }
 
     @PostMapping("/employee")
@@ -36,7 +31,7 @@ public class TransactionController {
         try {
             transactionService.transferFundsEmployee(request);
             return ResponseEntity.ok("✅ Employee transfer successful");
-        } catch (IllegalArgumentException e) {
+        } catch (CustomerTransactionException e) {
             return ResponseEntity.badRequest().body("❌ " + e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("⚠️ Unexpected error");

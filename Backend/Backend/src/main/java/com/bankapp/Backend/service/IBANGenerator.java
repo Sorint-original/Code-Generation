@@ -4,32 +4,26 @@ import java.math.BigInteger;
 import java.util.Random;
 
 public class IBANGenerator {
+
     private static final String COUNTRY_CODE = "NL";
-    private static final String BANK_CODE = "INBK"; // InBanking's bank code
+    private static final String BANK_CODE = "INBK";
+    private final Random random = new Random();
 
-    public static void main(String[] args) {
-        String iban = generateDutchIBAN();
-        System.out.println("Generated IBAN: " + iban);
-    }
-
-    public static String generateDutchIBAN() {
+    public String generateDutchIBAN() {
         String accountNumber = generateRandomAccountNumber();
         String ibanWithoutChecksum = COUNTRY_CODE + "00" + BANK_CODE + accountNumber;
         String checksum = calculateIBANChecksum(ibanWithoutChecksum);
         return COUNTRY_CODE + checksum + BANK_CODE + accountNumber;
     }
 
-    private static String generateRandomAccountNumber() {
-        Random rand = new Random();
-        long number = Math.abs(rand.nextLong()) % 1_000_000_0000L; // Max 10 digits
+    private String generateRandomAccountNumber() {
+        long number = Math.abs(random.nextLong()) % 1_000_000_0000L;
         return String.format("%010d", number);
     }
 
-    private static String calculateIBANChecksum(String iban) {
-        // Move country code and checksum to the end
+    private String calculateIBANChecksum(String iban) {
         String rearranged = iban.substring(4) + iban.substring(0, 4);
 
-        // Replace letters with numbers (A=10, B=11, ..., Z=35)
         StringBuilder numericIBAN = new StringBuilder();
         for (char c : rearranged.toCharArray()) {
             if (Character.isLetter(c)) {
@@ -44,4 +38,3 @@ public class IBANGenerator {
         return String.format("%02d", checksum);
     }
 }
-

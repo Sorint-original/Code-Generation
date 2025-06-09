@@ -51,7 +51,7 @@ public class DataSeeder implements ApplicationRunner {
             user1.setPhoneNumber("0612345678");
             user1.setDateOfBirth(LocalDate.parse("1990-01-01"));
             user1.setBsnNumber("123456789");
-            user1.setStatus(CustomerStatus.Pending);
+            user1.setStatus(CustomerStatus.Approved);
 
             User user2 = new User();
             user2.setFirstName("Bob");
@@ -88,12 +88,38 @@ public class DataSeeder implements ApplicationRunner {
             user4.setBsnNumber("987654389080921");
             user4.setStatus(CustomerStatus.Pending);
 
+            User user5 = new User();
+            user5.setFirstName("user5");
+            user5.setLastName("test");
+            user5.setUserName("user5");
+            user5.setEmail("user5@example.com");
+            user5.setPassword(bCryptPasswordEncoder.encode("secureaccess"));
+            user5.setRole(Role.CUSTOMER);
+            user5.setPhoneNumber("062345893443078096789");
+            user5.setDateOfBirth(LocalDate.parse("1985-05-15"));
+            user5.setBsnNumber("9876543894343080921");
+            user5.setStatus(CustomerStatus.Pending);
+
+            User user6 = new User();
+            user6.setFirstName("user6");
+            user6.setLastName("test");
+            user6.setUserName("user6");
+            user6.setEmail("user6@example.com");
+            user6.setPassword(bCryptPasswordEncoder.encode("secureaccess"));
+            user6.setRole(Role.CUSTOMER);
+            user6.setPhoneNumber("0893443078096789");
+            user6.setDateOfBirth(LocalDate.parse("1985-05-15"));
+            user6.setBsnNumber("9876543080921");
+            user6.setStatus(CustomerStatus.Pending);
+
 
 
             userRepository.save(user1);
             userRepository.save(user2);
             userRepository.save(user3);
             userRepository.save(user4);
+            userRepository.save(user5);
+            userRepository.save(user6);
 
             BigDecimal bd1 =
                     new BigDecimal("124567890.0987654321");

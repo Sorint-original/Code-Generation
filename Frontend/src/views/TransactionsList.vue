@@ -1,7 +1,7 @@
 <template>
   <div class="container-fluid min-vh-100 bg-light">
     <h3 v-if="transactionSource === 'AllTransactions'">All Transactions</h3>
-    <h3 v-else >User Transactions</h3>
+    <h3 v-else >My Transactions</h3>
 
     <!-- Filter Section -->
     <div class="card mb-4">

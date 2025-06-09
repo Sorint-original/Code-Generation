@@ -13,8 +13,12 @@ import AllAccountsPage from "@/views/AllAccountsPage.vue";
 import TransferFundsPage from "@/views/TransferFundsPage.vue";
 import TransactionForm from "@/views/TransactionForm.vue";
 import TransactionsList from "@/views/TransactionsList.vue";
+import ApproveCustomers from '../views/ApproveCustomers.vue';
+import CustomerDashboard from "@/views/CustomerDashboard.vue";
+
 
 const routes = [
+    { path: "/", redirect: "/login" },
   { path: "/login", component: LoginPage },
   { path: "/register", component: RegisterPage },
   { path: "/transaction", component: TransactionForm, meta: { requiresAuth: true } },
@@ -28,10 +32,17 @@ const routes = [
     component: EmployeeDashboard,
     meta: { requiresAuth: true, role: "EMPLOYEE" }
   },
-  { path: "/unauthorized", component: UnAuthorizedPage },
-  { path: "/account", component: AccountInfoPage },
-  { path: "/account/all", component: AllAccountsPage },
-  { path: "/transfer", component: TransferFundsPage },
+    { path: "/unauthorized", component: UnAuthorizedPage },
+    { path: "/account", component: AccountInfoPage },
+    { path: "/account/all", component: AllAccountsPage },
+    { path: "/transfer", component: TransferFundsPage },
+    {
+      path: '/employee/approve-customers',
+      name: 'ApproveCustomers',
+      component: ApproveCustomers
+    },
+    {path: '/customer/dashboard', component: CustomerDashboard, meta: { requiresAuth: true } },
+
 ];
 
 const router = createRouter({

@@ -31,22 +31,6 @@ public class BankAccountService {
                 .orElseThrow(() -> new AccountNotFoundException("Account with IBAN " + iban + " not found."));
     }
 
-    public void approveCustomer(User user) {
-        if (user.getRole() != Role.CUSTOMER) {
-            throw new InvalidUserRoleException("Only customers can be approved.");
-        }
-
-        if (!user.getBankAccounts().isEmpty()) {
-            throw new AccountAlreadyExistsException("Customer already has existing accounts.");
-        }
-
-        BankAccount checking = new BankAccount(user, AccountType.CHECKING, ibanGenerator.generateDutchIBAN());
-        BankAccount savings = new BankAccount(user, AccountType.SAVINGS, ibanGenerator.generateDutchIBAN());
-
-        bankAccountRepository.save(checking);
-        bankAccountRepository.save(savings);
-    }
-
     public void changeDailyLimit(BankAccount bankAccount, BigDecimal newLimit) {
         bankAccountRepository.updateDailyLimitByIban(bankAccount.getIban(), newLimit);
     }

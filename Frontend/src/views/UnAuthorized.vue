@@ -32,10 +32,10 @@
 <style>
     body{
   background-color: #1C2127;
+  margin: 0;
 }
 .container{
-  position: fixed;
-  left: 1000px;
+  float: right;
 }
 .message{
   font-family: 'Poppins', sans-serif;

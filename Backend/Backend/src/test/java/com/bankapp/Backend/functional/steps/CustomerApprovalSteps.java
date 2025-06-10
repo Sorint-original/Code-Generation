@@ -68,7 +68,7 @@ public class CustomerApprovalSteps {
             // Send JSON body with limits
             JSONObject requestBody = new JSONObject();
             requestBody.put("customerId", customerId);
-            requestBody.put("absoluteTransferLimit", 10000);
+            requestBody.put("absoluteTransferLimit", 100);
             requestBody.put("dailyTransferLimit", 5000);
 
             requestEntity = new HttpEntity<>(requestBody.toString(), headers);

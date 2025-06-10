@@ -21,13 +21,12 @@ public class LoginSteps {
         this.email = email;
         this.password = password;
 
-        // You can either mock this or ensure this user exists before running the test
-        // Assume the user is already registered for now
+
     }
 
-    @When("I send a login request with email {string} and password {string}")
-    public void i_send_a_login_request(String email, String password) {
-        LoginRequest request = new LoginRequest(email, password);
+    @When("I send a login request")
+    public void i_send_a_login_request() {
+        LoginRequest request = new LoginRequest(this.email, this.password);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

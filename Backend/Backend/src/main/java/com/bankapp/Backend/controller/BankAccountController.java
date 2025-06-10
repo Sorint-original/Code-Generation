@@ -1,5 +1,6 @@
 package com.bankapp.Backend.controller;
 
+import com.bankapp.Backend.DTO.AbsoluteLimitRequest;
 import com.bankapp.Backend.DTO.AccountInfoResponse;
 import com.bankapp.Backend.DTO.BankAccountResponse;
 import com.bankapp.Backend.model.AccountStatus;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,4 +33,10 @@ public class BankAccountController {
         List<BankAccount> accounts = bankAccountService.getBankAccountsByUserId(bankAccountService.getCurrentUserId());
         return ResponseEntity.ok(bankAccountService.infoToResponse(accounts));
     }
+
+    @PostMapping("/updateAbsoluteLimit")
+    public void setAbsoluteLimit(@RequestBody AbsoluteLimitRequest request){
+        bankAccountService.changeAbsoluteLimit(request);
+    }
+
 }

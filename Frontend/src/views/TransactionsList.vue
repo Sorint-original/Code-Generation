@@ -37,6 +37,33 @@
             <input type="text" class="form-control" v-model="filters.iban" placeholder="Enter IBAN">
           </div>
 
+           <!-- Name Filter with Autocomplete -->
+          <div class="col-md-4 position-relative">
+            <label class="form-label">Initiating User</label>
+            <input
+              type="text"
+              class="form-control"
+              v-model="filters.userName"
+              @input="updateNameSuggestions"
+              placeholder="Type a name"
+              autocomplete="off"
+            />
+            <ul
+              v-if="showNameSuggestions && nameSuggestions.length"
+              class="list-group position-absolute w-100"
+              style="z-index:1000; max-height:200px; overflow-y:auto;"
+            >
+              <li
+                v-for="name in nameSuggestions"
+                :key="name"
+                class="list-group-item list-group-item-action"
+                @click="selectUserName(name)"
+              >
+                {{ name }}
+              </li>
+            </ul>
+          </div>
+
           <!-- Filter Button -->
           <div class="col-md-6 d-flex align-items-end">
             <button class="btn btn-primary me-2" @click="applyFilters">
@@ -169,6 +196,12 @@
                return false;
              }
            }
+           if (this.filters.userName) {
+            const searchName = this.filters.userName.toLowerCase();
+            if (!transaction.initiatingUser.userName.toLowerCase().includes(searchName)) {
+              return false;
+            }
+          }
 
            return true;
          });
@@ -179,7 +212,8 @@
            endDate: null,
            amountOperator: '>',
            amountValue: null,
-           iban: null
+           iban: null,
+           userName: null
          };
          this.filteredTransactions = [...this.transactions];
        },

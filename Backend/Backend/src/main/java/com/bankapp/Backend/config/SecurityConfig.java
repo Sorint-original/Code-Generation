@@ -45,6 +45,7 @@ public class SecurityConfig {
 
                         .requestMatchers("/api/login").permitAll()
                         .requestMatchers("/api/user/register").permitAll()
+                        .requestMatchers("/api/account/updateAbsoluteLimit").permitAll()
 
 
                         .anyRequest().authenticated()

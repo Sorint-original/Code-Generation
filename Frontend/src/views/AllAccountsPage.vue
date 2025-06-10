@@ -37,10 +37,37 @@
               >
                 Change Limit
               </button>
+
+              <button
+                class="btn btn-sm btn-danger"
+                @click="setAbsoluteLimit(account)"
+              >
+                Absolute Limit
+              </button>
             </td>
           </tr>
         </tbody>
       </table>
+
+      <!-- Modal for Absolute Limit -->
+      <div v-if="showLimitModal" class="modal-backdrop" id = "LimitModel">
+        <div class="modal-dialog">
+          <div class="modal-content p-4">
+            <h5 class="mb-3">Set Absolute Limit for IBAN: {{ selectedAccount?.iban }}</h5>
+            <input
+              type="number"
+              class="form-control mb-3"
+              v-model="absoluteLimit"
+              placeholder="Enter absolute limit"
+              min="0"
+            />
+            <div class="d-flex justify-content-end">
+              <button class="btn btn-secondary me-2" @click="closeLimitModal">Cancel</button>
+              <button class="btn btn-primary" @click="submitAbsoluteLimit">Set Limit</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div v-if="error" class="text-danger mt-3 text-center">{{ error }}</div>
     </div>
@@ -123,6 +150,48 @@ const closeAccount = async (iban) => {
   } finally {
     loadingIbans.value = loadingIbans.value.filter(i => i !== iban);
   }
+}
+
+onMounted(fetchAccounts)
+
+const showLimitModal = ref(false)
+const selectedAccount = ref(null)
+const absoluteLimit = ref('')
+
+const setAbsoluteLimit = (account) => {
+  selectedAccount.value = account
+  absoluteLimit.value = ''
+  showLimitModal.value = true
+}
+const closeLimitModal = () => {
+  showLimitModal.value = false
+  selectedAccount.value = null
+  absoluteLimit.value = ''
+}
+
+const submitAbsoluteLimit = async () => {
+  if (!selectedAccount.value || !absoluteLimit.value) {
+    error.value = 'Please enter a valid limit.'
+    return
+  }
+  if (Number(absoluteLimit.value) >= Number(selectedAccount.value.dailyTransferLimit)) {
+    window.alert('Absolute limit must be smaller than daily limit')
+    return
+  }
+  try {
+    await api.post('/account/updateAbsoluteLimit', {
+      bankAccount: selectedAccount.value.iban,
+      limit: Number(absoluteLimit.value)
+    })
+    const acc = accounts.value.find(a => a.iban === selectedAccount.value.iban)
+    if (acc) acc.absoluteTransferLimit = absoluteLimit.value
+    window.alert('Absolute limit updated')
+    closeLimitModal()
+  } catch (err) {
+    error.value = 'Failed to set absolute limit.'
+    console.error(err)
+  }
+}
 };
 
 const openLimitModal = (account) => {
@@ -155,3 +224,24 @@ const submitLimitChange = async () => {
 
 onMounted(fetchAccounts);
 </script>
+
+<style scoped>
+
+.modal-backdrop {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+}
+.modal-dialog {
+  background: #fff;
+  border-radius: 8px;
+  min-width: 320px;
+  max-width: 90vw;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.2);
+}
+
+</style>

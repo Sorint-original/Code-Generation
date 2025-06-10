@@ -122,6 +122,10 @@ html, body, #app {
   background-color: #09C7FB;
 }
 
+.form-label {
+  color: #fff;
+}
+
 .screen {
   padding: 2rem;
 }

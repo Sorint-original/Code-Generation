@@ -1,11 +1,13 @@
 package com.bankapp.Backend.service;
 
+import com.bankapp.Backend.DTO.AbsoluteLimitRequest;
 import com.bankapp.Backend.DTO.AccountInfoResponse;
 import com.bankapp.Backend.DTO.BankAccountResponse;
 import com.bankapp.Backend.exception.*;
 import com.bankapp.Backend.model.*;
 import com.bankapp.Backend.repository.BankAccountRepository;
 import com.bankapp.Backend.security.MyUserDetails;
+import jakarta.transaction.Transactional;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -41,6 +43,11 @@ public class BankAccountService {
         }
 
         bankAccountRepository.updateDailyLimitByIban(bankAccount.getIban(), newLimit);
+    }
+
+    @Transactional
+    public void changeAbsoluteLimit(AbsoluteLimitRequest request) {
+        bankAccountRepository.updateAbsoluteLimitByIban(request.getBankAccount(), request.getLimit());
     }
 
 

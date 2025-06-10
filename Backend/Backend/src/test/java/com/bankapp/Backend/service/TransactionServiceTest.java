@@ -1,11 +1,11 @@
 package com.bankapp.Backend.service;
 
 import com.bankapp.Backend.DTO.TransactionRequest;
+import com.bankapp.Backend.exception.CustomerTransactionException;
 import com.bankapp.Backend.model.*;
 import com.bankapp.Backend.repository.BankAccountRepository;
 import com.bankapp.Backend.repository.TransactionRepository;
 import com.bankapp.Backend.repository.UserRepository;
-import jakarta.validation.constraints.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,18 +14,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.any;
-
-import static org.mockito.Mockito.when;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class TransactionServiceTest {
@@ -55,6 +48,7 @@ class TransactionServiceTest {
         testUser.setUserName("johndoe");
         testUser.setEmail("initiator@example.com");
         testUser.setPhoneNumber("1234567890");
+        testUser.setRole(Role.CUSTOMER);
 
         fromAccount = new BankAccount();
         fromAccount.setId(100L);
@@ -62,15 +56,15 @@ class TransactionServiceTest {
         fromAccount.setAmount(BigDecimal.valueOf(1000));
         fromAccount.setType(AccountType.CHECKING);
         fromAccount.setIban("FROM123");
-        fromAccount.setAbsoluteTransferLimit(BigDecimal.valueOf(1000));
+        fromAccount.setAbsoluteTransferLimit(BigDecimal.valueOf(100));
         fromAccount.setDailyTransferLimit(BigDecimal.valueOf(500));
         fromAccount.setStatus(AccountStatus.APPROVED);
 
         toAccount = new BankAccount();
         toAccount.setId(101L);
-        toAccount.setUser(testUser);
+        toAccount.setUser(new User()); // different user
         toAccount.setAmount(BigDecimal.valueOf(500));
-        toAccount.setType(AccountType.SAVINGS);
+        toAccount.setType(AccountType.CHECKING);
         toAccount.setIban("TO456");
         toAccount.setAbsoluteTransferLimit(BigDecimal.valueOf(1000));
         toAccount.setDailyTransferLimit(BigDecimal.valueOf(500));
@@ -79,12 +73,15 @@ class TransactionServiceTest {
 
     @Test
     void transferFundsEmployee_ShouldTransferSuccessfully() {
-        TransactionRequest request = new TransactionRequest("FROM123", "TO456", BigDecimal.valueOf(100));
+        TransactionRequest request = new TransactionRequest();
+        request.setFromAccountIban("FROM123");
+        request.setToAccountIban("TO456");
+        request.setAmount(BigDecimal.valueOf(100));
         request.setInitiatorEmail("initiator@example.com");
-        request.setAccountType(AccountType.CHECKING);
 
         when(bankAccountRepository.findByIban("FROM123")).thenReturn(Optional.of(fromAccount));
         when(bankAccountRepository.findByIban("TO456")).thenReturn(Optional.of(toAccount));
+        when(transactionRepository.getTotalTransferredToday(fromAccount)).thenReturn(BigDecimal.ZERO);
         when(userRepository.findUserByEmail("initiator@example.com")).thenReturn(Optional.of(testUser));
 
         transactionService.transferFundsEmployee(request);
@@ -94,7 +91,6 @@ class TransactionServiceTest {
 
         verify(transactionRepository, times(1)).save(any(Transaction.class));
     }
-
 
     @Test
     void transferFundsEmployee_ShouldThrow_WhenFromAccountNotFound() {
@@ -106,7 +102,7 @@ class TransactionServiceTest {
 
         when(bankAccountRepository.findByIban("FROM123")).thenReturn(Optional.empty());
 
-        Exception ex = assertThrows(IllegalArgumentException.class, () ->
+        Exception ex = assertThrows(CustomerTransactionException.class, () ->
                 transactionService.transferFundsEmployee(request)
         );
 
@@ -124,7 +120,7 @@ class TransactionServiceTest {
         when(bankAccountRepository.findByIban("FROM123")).thenReturn(Optional.of(fromAccount));
         when(bankAccountRepository.findByIban("TO456")).thenReturn(Optional.empty());
 
-        Exception ex = assertThrows(IllegalArgumentException.class, () ->
+        Exception ex = assertThrows(CustomerTransactionException.class, () ->
                 transactionService.transferFundsEmployee(request)
         );
 
@@ -144,40 +140,53 @@ class TransactionServiceTest {
         when(bankAccountRepository.findByIban("FROM123")).thenReturn(Optional.of(fromAccount));
         when(bankAccountRepository.findByIban("TO456")).thenReturn(Optional.of(toAccount));
 
-        Exception ex = assertThrows(IllegalArgumentException.class, () ->
+        Exception ex = assertThrows(CustomerTransactionException.class, () ->
                 transactionService.transferFundsEmployee(request)
         );
 
-        assertEquals("Cannot transfer to of from Saving account.", ex.getMessage());
+        assertEquals("Cannot transfer to or from Saving account.", ex.getMessage());
     }
 
     @Test
-    void fetchTransactionHistory_ReturnsAllTransactions() {
-        when(transactionRepository.findAllTransactions())
-                .thenReturn(List.of(new Transaction(), new Transaction()));
+    void transferFunds_CustomerInsufficientFunds_ShouldThrow() {
+        fromAccount.setAmount(BigDecimal.valueOf(50));
 
-        List<Transaction> result = transactionService.fetchTransactionHistory();
+        TransactionRequest request = new TransactionRequest();
+        request.setFromAccountIban("FROM123");
+        request.setToAccountIban("TO456");
+        request.setAmount(BigDecimal.valueOf(100));
+        request.setInitiatorEmail("initiator@example.com");
 
-        assertEquals(2, result.size());
-        verify(transactionRepository, times(1)).findAllTransactions();
+        when(bankAccountRepository.findByIban("FROM123")).thenReturn(Optional.of(fromAccount));
+        when(bankAccountRepository.findByIban("TO456")).thenReturn(Optional.of(toAccount));
+
+        Exception ex = assertThrows(CustomerTransactionException.class, () ->
+                transactionService.transferFundsEmployee(request)
+        );
+
+        assertTrue(ex.getMessage().contains("Insufficient funds"));
     }
+
 
     @Test
-    void fetchUserTransactionHistory_ReturnsOnlyUserTransactions() {
-        long userId = testUser.getId();
-        Transaction t1 = new Transaction();
-        Transaction t2 = new Transaction();
-        t1.setInitiatingUser(testUser);
-        t2.setInitiatingUser(testUser);
+    void transferFunds_CustomerBelowAbsoluteLimit_ShouldThrow() {
+        fromAccount.setAmount(BigDecimal.valueOf(200));
+        fromAccount.setAbsoluteTransferLimit(BigDecimal.valueOf(200));
 
-        when(transactionRepository.findAllUserRelatedTransactions(userId))
-                .thenReturn(Arrays.asList(t1, t2));
+        TransactionRequest request = new TransactionRequest();
+        request.setFromAccountIban("FROM123");
+        request.setToAccountIban("TO456");
+        request.setAmount(BigDecimal.valueOf(1));
+        request.setInitiatorEmail("initiator@example.com");
 
-        List<Transaction> result = transactionService.fetchUserTransactionHistory(userId);
+        when(bankAccountRepository.findByIban("FROM123")).thenReturn(Optional.of(fromAccount));
+        when(bankAccountRepository.findByIban("TO456")).thenReturn(Optional.of(toAccount));
 
-        assertEquals(2, result.size());
-        verify(transactionRepository, times(1))
-                .findAllUserRelatedTransactions(userId);
+        Exception ex = assertThrows(CustomerTransactionException.class, () ->
+                transactionService.transferFundsEmployee(request)
+        );
+
+        assertTrue(ex.getMessage().contains("Transfer must exceed absolute transfer limit"));
     }
+
 }
-

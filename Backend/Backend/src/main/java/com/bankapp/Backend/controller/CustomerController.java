@@ -33,6 +33,9 @@ public class CustomerController {
     @PostMapping("/search")
     public ResponseEntity<List<RecipientAccount>> searchRecipients(@RequestBody Map<String, String> body) {
         String query = body.get("query");
+        if (query == null) {
+            throw new IllegalArgumentException("Missing 'query' field in request body.");
+        }
         return ResponseEntity.ok(customerService.searchRecipientAccounts(query));
     }
 

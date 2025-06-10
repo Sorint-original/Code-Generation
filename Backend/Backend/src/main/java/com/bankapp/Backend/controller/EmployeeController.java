@@ -79,15 +79,15 @@ public class EmployeeController {
     }
 
     @PostMapping("/change-limit")
-    public ResponseEntity<ChangeDailyLimitResponse> changeDailyLimit(@RequestBody ChangeDailyLimitRequest request) {
+    public ResponseEntity<ChangeDailyLimitResponse> changeDailyLimit(@RequestBody ChangeBankAcountsRequest request) {
         try {
             BankAccount bankAccount = bankAccountService.GetBankAccount(request.getIban());
-            bankAccountService.changeDailyLimit(bankAccount, request.getDailyLimit());
-            ChangeDailyLimitResponse response = new ChangeDailyLimitResponse(bankAccount, true, "Daily limit changes successfully");
+            bankAccountService.ChangeBankAccountLimits(bankAccount, request.getDailyLimit(), request.getAbsoluteLimit());
+            ChangeDailyLimitResponse response = new ChangeDailyLimitResponse(bankAccount, true, " limits changes successfully");
             return ResponseEntity.ok().body(response);
 
         } catch (Exception e) {
-            ChangeDailyLimitResponse response = new ChangeDailyLimitResponse(null, false, e.getMessage() + "Failed to change daily limit");
+            ChangeDailyLimitResponse response = new ChangeDailyLimitResponse(null, false, e.getMessage() + "Failed to change limits");
             return ResponseEntity.badRequest().body(response);
         }
     }

@@ -34,9 +34,6 @@ public class BankAccountController {
         return ResponseEntity.ok(bankAccountService.infoToResponse(accounts));
     }
 
-    @PostMapping("/updateAbsoluteLimit")
-    public void setAbsoluteLimit(@RequestBody AbsoluteLimitRequest request){
-        bankAccountService.changeAbsoluteLimit(request);
-    }
+
 
 }

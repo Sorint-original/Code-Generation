@@ -26,6 +26,7 @@ public interface BankAccountRepository extends JpaRepository<BankAccount, Long> 
     void updateDailyLimitByIban(@Param("iban") String iban, @Param("newLimit") BigDecimal newLimit);
 
     @Modifying
+    @Transactional
     @Query("UPDATE BankAccount b SET b.absoluteTransferLimit = :newLimit WHERE b.iban = :iban")
     void updateAbsoluteLimitByIban(@Param("iban") String iban, @Param("newLimit") BigDecimal newLimit);
 

@@ -33,21 +33,20 @@ public class BankAccountService {
                 .orElseThrow(() -> new AccountNotFoundException("Account with IBAN " + iban + " not found."));
     }
 
-    public void changeDailyLimit(BankAccount bankAccount, BigDecimal newLimit) {
-        if (newLimit == null || newLimit.compareTo(BigDecimal.ZERO) <= 0) {
+    public void validateLimits(BigDecimal dailyLimit, BigDecimal absoluteLimit){
+        if (absoluteLimit == null || absoluteLimit.compareTo(BigDecimal.ZERO) <= 0 || dailyLimit == null || dailyLimit.compareTo(BigDecimal.ZERO) <= 0) {
             throw new InvalidTransferLimitException("Daily limit must be greater than 0 and not null.");
         }
 
-        if (bankAccount.getAbsoluteTransferLimit().compareTo(newLimit) >= 0) {
+        if (absoluteLimit.compareTo(dailyLimit) >= 0) {
             throw new InvalidTransferLimitException("Daily limit must be greater than the absolute transfer limit.");
         }
-
-        bankAccountRepository.updateDailyLimitByIban(bankAccount.getIban(), newLimit);
     }
 
-    @Transactional
-    public void changeAbsoluteLimit(AbsoluteLimitRequest request) {
-        bankAccountRepository.updateAbsoluteLimitByIban(request.getBankAccount(), request.getLimit());
+    public void ChangeBankAccountLimits(BankAccount bankAccount, BigDecimal dailyLimit, BigDecimal absoluteLimit) {
+        validateLimits(dailyLimit, absoluteLimit);
+        bankAccountRepository.updateDailyLimitByIban(bankAccount.getIban(), dailyLimit);
+        bankAccountRepository.updateAbsoluteLimitByIban(bankAccount.getIban(), absoluteLimit);
     }
 
 

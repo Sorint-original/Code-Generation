@@ -189,10 +189,10 @@ const submitAbsoluteLimit = async () => {
     closeLimitModal()
   } catch (err) {
     error.value = 'Failed to set absolute limit.'
-    console.error(err)
+    console.error(err);
   }
 }
-};
+
 
 const openLimitModal = (account) => {
   form.value.iban = account.iban;

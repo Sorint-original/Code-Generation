@@ -16,8 +16,7 @@ public class UnapprovedCustomersSteps {
 
     @Given("I have the role {string}")
     public void i_have_the_role(String role) throws JSONException {
-        // You can hardcode or login and get a token from a known employee
-        // Here we assume you've already seeded an employee account
+
         String email = "bob@example.com";
         String password = "secureaccess";
 

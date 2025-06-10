@@ -1,13 +1,15 @@
 package com.bankapp.Backend.controller;
 
+import com.bankapp.Backend.DTO.ApproveCustomerRequest;
 import com.bankapp.Backend.DTO.BankAccountResponse;
+import com.bankapp.Backend.DTO.GlobalApiResponse;
 import com.bankapp.Backend.DTO.TransactionRequest;
-import com.bankapp.Backend.model.AccountType;
-import com.bankapp.Backend.model.AccountStatus;
-import com.bankapp.Backend.model.BankAccount;
-import com.bankapp.Backend.model.User;
+import com.bankapp.Backend.exception.UserNotFoundException;
+import com.bankapp.Backend.model.*;
 import com.bankapp.Backend.service.BankAccountService;
+import com.bankapp.Backend.service.EmployeeService;
 import com.bankapp.Backend.service.TransactionService;
+import com.bankapp.Backend.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,8 +23,8 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class EmployeeControllerTest {
@@ -32,6 +34,12 @@ class EmployeeControllerTest {
 
     @Mock
     private BankAccountService bankAccountService;
+    @Mock
+    private UserService userService;
+
+    @Mock
+    private EmployeeService employeeService;
+
 
     @Mock
     private TransactionService transactionService;
@@ -104,5 +112,76 @@ class EmployeeControllerTest {
 
         assertEquals(HttpStatus.OK, result.getStatusCode());
         verify(transactionService).transferFundsEmployee(request);
+    }
+
+    @Test
+    void getUnapprovedCustomers_shouldReturnListOfUsers() {
+        User mockUser = new User();
+        mockUser.setId(1L);
+        mockUser.setStatus(CustomerStatus.Pending);
+
+        when(userService.findUnapprovedUsers(Role.CUSTOMER))
+                .thenReturn(List.of(mockUser));
+
+        ResponseEntity<List<User>> response = employeeController.getUnapprovedCustomers();
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(1, response.getBody().size());
+        assertEquals(CustomerStatus.Pending, response.getBody().get(0).getStatus());
+    }
+    @Test
+    void approveCustomer_shouldApproveCustomerSuccessfully() {
+        ApproveCustomerRequest request = new ApproveCustomerRequest(1L, BigDecimal.valueOf(100), BigDecimal.valueOf(1000));
+
+        User mockUser = new User();
+        mockUser.setId(1L);
+
+        when(userService.findById(1L)).thenReturn(mockUser);
+
+        ResponseEntity<GlobalApiResponse> response = employeeController.approveCustomer(request);
+
+        verify(employeeService).approveCustomer(mockUser, BigDecimal.valueOf(100), BigDecimal.valueOf(1000));
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody().isSuccess());
+        assertEquals("Customer approved and accounts created.", response.getBody().getMessage());
+    }
+
+    @Test
+    void approveCustomer_shouldThrowUserNotFound_whenUserDoesNotExist() {
+        ApproveCustomerRequest request = new ApproveCustomerRequest(99L, BigDecimal.valueOf(100), BigDecimal.valueOf(1000));
+
+
+        when(userService.findById(99L)).thenReturn(null);
+
+        assertThrows(UserNotFoundException.class, () -> employeeController.approveCustomer(request));
+        verify(employeeService, never()).approveCustomer(any(), any(), any());
+    }
+
+    @Test
+    void declineCustomer_shouldUpdateUserStatusToDenied() {
+        User mockUser = new User();
+        mockUser.setId(1L);
+
+        when(userService.findById(1L)).thenReturn(mockUser);
+
+        ResponseEntity<GlobalApiResponse> response = employeeController.declineCustomerStatus(1L);
+
+        verify(employeeService).updateUserStatus(mockUser, CustomerStatus.Denied);
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody().isSuccess());
+        assertEquals("User status updated to Denied", response.getBody().getMessage());
+    }
+
+
+    @Test
+    void declineCustomer_shouldThrowUserNotFound_whenUserDoesNotExist() {
+        when(userService.findById(123L)).thenReturn(null);
+
+        assertThrows(UserNotFoundException.class, () -> employeeController.declineCustomerStatus(123L));
+        verify(employeeService, never()).updateUserStatus(any(), any());
     }
 }

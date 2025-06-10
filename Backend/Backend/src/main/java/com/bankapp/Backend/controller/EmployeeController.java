@@ -56,25 +56,26 @@ public class EmployeeController {
     }
 
     @PostMapping("/customers/approve")
-    public ResponseEntity<String> approveCustomer(@RequestBody ApproveCustomerRequest request) {
+    public ResponseEntity<GlobalApiResponse> approveCustomer(@RequestBody ApproveCustomerRequest request) {
         User user = userService.findById(request.getCustomerId());
         if (user == null) {
             throw new UserNotFoundException(request.getCustomerId());
         }
 
         employeeService.approveCustomer(user, request.getAbsoluteTransferLimit(), request.getDailyTransferLimit());
-        return ResponseEntity.ok("Customer approved and accounts created.");
+        return ResponseEntity.ok(new GlobalApiResponse(true, "Customer approved and accounts created."));
     }
 
     @PostMapping("/customers/{id}/decline")
-    public ResponseEntity<String> declineCustomerStatus(@PathVariable Long id) {
+    public ResponseEntity<GlobalApiResponse> declineCustomerStatus(@PathVariable Long id) {
         User user = userService.findById(id);
         if (user == null) {
             throw new UserNotFoundException(id);
         }
 
         employeeService.updateUserStatus(user, CustomerStatus.Denied);
-        return ResponseEntity.ok("User status updated to " + CustomerStatus.Denied);
+        GlobalApiResponse globalApiResponse = new GlobalApiResponse(true, "User status updated to " + CustomerStatus.Denied);
+        return ResponseEntity.ok(globalApiResponse);
     }
 
     @PostMapping("/change-limit")

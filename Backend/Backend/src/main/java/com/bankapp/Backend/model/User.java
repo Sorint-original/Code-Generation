@@ -30,8 +30,6 @@ public class User {
     @Column(name = "role", nullable = false)
     private Role role;
 
-    @Column(name = "date_of_birth")
-    private LocalDate dateOfBirth;
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -57,13 +55,12 @@ public class User {
 
     public User() {}
 
-    public User(String firstName, String lastName, String userName, Role role, LocalDate dateOfBirth,
+    public User(String firstName, String lastName, String userName, Role role,
                 String email, String password, String phoneNumber, String bsnNumber, CustomerStatus status) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.userName = userName;
         this.role = role;
-        this.dateOfBirth = dateOfBirth;
         this.email = email;
         this.password = password;
         this.phoneNumber = phoneNumber;
@@ -87,8 +84,7 @@ public class User {
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
 
-    public LocalDate getDateOfBirth() { return dateOfBirth; }
-    public void setDateOfBirth(LocalDate dateOfBirth) { this.dateOfBirth = dateOfBirth; }
+
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }

@@ -36,6 +36,8 @@ public class UserService {
     }
 
     public CustomerRegistrationResponse registerCustomer(CustomerRegistrationRequest request) {
+        validateDigitsOnly(request.getPhoneNumber(), "Phone number");
+        validateDigitsOnly(request.getBsnNumber(), "BSN number");
         User newUser = new User();
         newUser.setFirstName(request.getFirstName());
         newUser.setLastName(request.getLastName());
@@ -55,6 +57,12 @@ public class UserService {
                 "Registration successful. Your account is pending approval."
         );
     }
+    private void validateDigitsOnly(String value, String fieldName) {
+        if (!value.matches("\\d+")) {
+            throw new IllegalArgumentException(fieldName + " must contain only digits.");
+        }
+    }
+
 
     public void validateUniqueFields(User user) {
         userRepository.findUserByEmail(user.getEmail())

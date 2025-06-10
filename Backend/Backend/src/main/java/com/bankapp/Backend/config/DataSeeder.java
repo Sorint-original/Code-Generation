@@ -49,7 +49,6 @@ public class DataSeeder implements ApplicationRunner {
             user1.setPassword(bCryptPasswordEncoder.encode("password123"));
             user1.setRole(Role.CUSTOMER);
             user1.setPhoneNumber("0612345678");
-            user1.setDateOfBirth(LocalDate.parse("1990-01-01"));
             user1.setBsnNumber("123456789");
             user1.setStatus(CustomerStatus.Approved);
 
@@ -61,7 +60,6 @@ public class DataSeeder implements ApplicationRunner {
             user2.setPassword(bCryptPasswordEncoder.encode("secureaccess"));
             user2.setRole(Role.EMPLOYEE);
             user2.setPhoneNumber("0623456789");
-            user2.setDateOfBirth(LocalDate.parse("1985-05-15"));
             user2.setBsnNumber("987654321");
 
             User user3 = new User();
@@ -72,7 +70,6 @@ public class DataSeeder implements ApplicationRunner {
             user3.setPassword(bCryptPasswordEncoder.encode("secureaccess"));
             user3.setRole(Role.CUSTOMER);
             user3.setPhoneNumber("062344356789");
-            user3.setDateOfBirth(LocalDate.parse("1985-05-15"));
             user3.setBsnNumber("987689080954321");
             user3.setStatus(CustomerStatus.Pending);
 
@@ -84,7 +81,6 @@ public class DataSeeder implements ApplicationRunner {
             user4.setPassword(bCryptPasswordEncoder.encode("secureaccess"));
             user4.setRole(Role.CUSTOMER);
             user4.setPhoneNumber("06234589078096789");
-            user4.setDateOfBirth(LocalDate.parse("1985-05-15"));
             user4.setBsnNumber("987654389080921");
             user4.setStatus(CustomerStatus.Pending);
 
@@ -96,7 +92,6 @@ public class DataSeeder implements ApplicationRunner {
             user5.setPassword(bCryptPasswordEncoder.encode("secureaccess"));
             user5.setRole(Role.CUSTOMER);
             user5.setPhoneNumber("062345893443078096789");
-            user5.setDateOfBirth(LocalDate.parse("1985-05-15"));
             user5.setBsnNumber("9876543894343080921");
             user5.setStatus(CustomerStatus.Pending);
 
@@ -108,7 +103,6 @@ public class DataSeeder implements ApplicationRunner {
             user6.setPassword(bCryptPasswordEncoder.encode("secureaccess"));
             user6.setRole(Role.CUSTOMER);
             user6.setPhoneNumber("0893443078096789");
-            user6.setDateOfBirth(LocalDate.parse("1985-05-15"));
             user6.setBsnNumber("9876543080921");
             user6.setStatus(CustomerStatus.Pending);
 

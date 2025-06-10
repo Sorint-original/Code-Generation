@@ -169,29 +169,6 @@ const closeLimitModal = () => {
   absoluteLimit.value = ''
 }
 
-const submitAbsoluteLimit = async () => {
-  if (!selectedAccount.value || !absoluteLimit.value) {
-    error.value = 'Please enter a valid limit.'
-    return
-  }
-  if (Number(absoluteLimit.value) >= Number(selectedAccount.value.dailyTransferLimit)) {
-    window.alert('Absolute limit must be smaller than daily limit')
-    return
-  }
-  try {
-    await api.post('/account/updateAbsoluteLimit', {
-      bankAccount: selectedAccount.value.iban,
-      limit: Number(absoluteLimit.value)
-    })
-    const acc = accounts.value.find(a => a.iban === selectedAccount.value.iban)
-    if (acc) acc.absoluteTransferLimit = absoluteLimit.value
-    window.alert('Absolute limit updated')
-    closeLimitModal()
-  } catch (err) {
-    error.value = 'Failed to set absolute limit.'
-    console.error(err);
-  }
-}
 
 
 const openLimitModal = (account) => {

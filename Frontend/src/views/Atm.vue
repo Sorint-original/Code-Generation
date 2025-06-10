@@ -70,6 +70,10 @@ function logout() {
   </div>
 
   <div class="screen d-flex justify-content-between" style="margin-top: 150px;">
+    
+  </div>
+
+  <div class="screen d-flex justify-content-between" style="margin-top: 150px;">
     <template v-if="showButtons">
       <button
         class="btn btn-primary w-40"

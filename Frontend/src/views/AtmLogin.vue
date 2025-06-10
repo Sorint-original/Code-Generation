@@ -57,7 +57,12 @@ export default {
         this.errorMessages = "";
 
 
-        this.router.push("/atm");
+        const role = this.authStore.role;
+        if (role === "EMPLOYEE") {
+          this.router.push("/employee");
+        } else {
+          this.router.push('/Atm');
+        }
       } catch (error) {
         if (error.response && error.response.data) {
           this.errorMessages =

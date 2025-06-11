@@ -10,7 +10,7 @@ export default defineConfig({
     vue(),
     vueDevTools(),
   ],
-  base: '/Code-Generation/', // ← fix is here
+  base: '/', // ← fix is here
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))

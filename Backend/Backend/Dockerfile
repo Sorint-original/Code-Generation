@@ -3,7 +3,6 @@ RUN apt-get update
 RUN apt-get install openjdk-21-jdk -y
 COPY . .
 # Fix permissions and make mvnw executable (CRITICAL STEP)
-
 RUN chmod +x mvnw
 RUN ./mvnw clean install -U -DskipTests
 EXPOSE 8080

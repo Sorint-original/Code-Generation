@@ -24,6 +24,17 @@
 
 
         <p v-if="errorMessages" class="text-danger mt-2">{{ errorMessages }}</p>
+        <!-- ATM Navigation Button -->
+        <div class="mt-3 text-center">
+          <button
+            type="button"
+            class="btn btn-outline-primary"
+            @click="goToAtm"
+          >
+            Access ATM
+          </button>
+        </div>
+
       </form>
     </div>
   </div>
@@ -87,6 +98,10 @@ export default {
     goToRegister() {
       this.router.push("/register");
     },
+    goToAtm() {
+      this.router.push("/atm");
+    },
+
   },
 };
 </script>

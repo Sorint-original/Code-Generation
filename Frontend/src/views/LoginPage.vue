@@ -99,7 +99,7 @@ export default {
       this.router.push("/register");
     },
     goToAtm() {
-      this.router.push("/atm");
+      this.router.push("/atm/login");
     },
 
   },

@@ -55,7 +55,17 @@ public class BankAccountService {
     }
 
     public List<BankAccount> getBankAccountsByUserId(Long userId) {
-        return bankAccountRepository.findBankAccountsByUserId(userId);
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID cannot be null");
+        }
+
+        List<BankAccount> accounts = bankAccountRepository.findBankAccountsByUserId(userId);
+
+        if (accounts.isEmpty()) {
+            throw new AccountNotFoundException("No accounts found for user ID " + userId);
+        }
+
+        return accounts;
     }
 
     public void updateAccountStatus(String iban, AccountStatus status) {

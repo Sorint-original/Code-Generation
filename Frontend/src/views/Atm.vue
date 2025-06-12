@@ -122,6 +122,12 @@ function logout() {
     </button>
   </div>
 
+  <div v-if="selectedAccount && showButtons" class="text-center mb-4">
+    <label class="balance-label">
+      Balance: {{ selectedAccount.amount }}
+    </label>
+  </div>
+
   <template v-if="showAccounts">
     <div class="d-flex justify-content-center align-items-center" style="min-height: 60vh;">
       <div>

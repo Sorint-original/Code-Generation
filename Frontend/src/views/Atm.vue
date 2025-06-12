@@ -54,7 +54,6 @@ function backToSelection() {
   showButtons.value = true
   withDrawButton.value = false
   depositButton.value = false
-  selectedAccount.value = null
   amount.value = ''
   loading.value = false
   successMessage.value = ''

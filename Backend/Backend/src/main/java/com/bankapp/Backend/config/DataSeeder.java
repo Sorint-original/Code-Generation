@@ -123,9 +123,11 @@ public class DataSeeder implements ApplicationRunner {
 
             BankAccount bankAccount1 = new BankAccount(user1, new BigDecimal("10000.00"), AccountType.CHECKING, "21345643211", new BigDecimal("1.00"), new BigDecimal("1000.00"), AccountStatus.APPROVED);
             BankAccount bankAccount2 = new BankAccount(user2, new BigDecimal("10000.00"), AccountType.CHECKING, "2134564321", new BigDecimal("1.00"), new BigDecimal("1000.00"), AccountStatus.APPROVED);
+            BankAccount bankAccount3 = new BankAccount(user1, new BigDecimal("10000.00"), AccountType.SAVINGS, "213456432136565", new BigDecimal("1.00"), new BigDecimal("1000.00"), AccountStatus.APPROVED);
 
             bankAccountRepository.save(bankAccount1);
             bankAccountRepository.save(bankAccount2);
+            bankAccountRepository.save(bankAccount3);
 
             // Create test transactions
             Transaction t1 = new Transaction(bankAccount1, bankAccount2, new BigDecimal("500.00"), bankAccount1.getUser());

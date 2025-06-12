@@ -24,13 +24,12 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     @Query("""
     SELECT t FROM Transaction t
     WHERE 
-        (t.fromAccount IS NOT NULL AND t.fromAccount.user.id = :userId) OR
-        (t.toAccount IS NOT NULL AND t.toAccount.user.id = :userId) OR
-        t.initiatingUser.id = :userId
+        (t.fromAccount IS NOT NULL AND t.fromAccount.user.id = :userId)
+        OR (t.toAccount IS NOT NULL AND t.toAccount.user.id = :userId)
+        OR t.initiatingUser.id = :userId
     ORDER BY t.date DESC
-    """)
+""")
     List<Transaction> findAllUserRelatedTransactions(@Param("userId") Long userId);
-
 
 
 }

@@ -71,6 +71,8 @@ public class BankAccountServiceTest {
         String iban = "NL91ABNA0417164300";
         AccountStatus status = AccountStatus.BLOCKED;
 
+        when(bankAccountRepository.existsByIban(iban)).thenReturn(true);
+
         bankAccountService.updateAccountStatus(iban, status);
 
         verify(bankAccountRepository).updateStatusByIban(iban, status);

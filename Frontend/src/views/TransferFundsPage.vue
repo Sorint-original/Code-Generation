@@ -1,146 +1,221 @@
 <template>
-  <div class="transfer-page d-flex justify-content-center align-items-center min-vh-100">
-    <div class="card p-5 shadow-lg transfer-card">
-      <img
-        src="../assets/img/May 14, 2025, 09_37_41 PM.png"
-        alt="Banking App Logo"
-        class="mx-auto d-block mb-4 logo-img"
-      />
+  <div class="transfer-page d-flex justify-content-center align-items-center vh-100">
+    <div class="card p-4 shadow-lg" style="width: 600px;">
+      <h3 class="text-center mb-4">Transfer Funds</h3>
 
-      <h3 class="text-center fw-bold mb-4">Transfer Funds</h3>
+      <form @submit.prevent="submitTransfer">
 
-      <form @submit.prevent="transferFunds" class="needs-validation">
+        <!-- FROM ACCOUNT SEARCH -->
         <div class="mb-3">
-          <label for="sourceIban" class="form-label">From Account (IBAN)</label>
-          <div class="input-group">
-            <span class="input-group-text"><i class="bi bi-box-arrow-in-right"></i></span>
-            <input
-              v-model="sourceIban"
-              id="sourceIban"
-              type="text"
-              class="form-control"
-              placeholder="NLxxBANKxxxx..."
-              required
-            />
+          <label class="form-label">Search Sender (min 2 letters)</label>
+          <input v-model="fromQuery" type="text" class="form-control" placeholder="Start typing name..." />
+        </div>
+
+        <div class="search-results-box mb-3">
+          <div v-if="fromQuery.length < 2" class="text-muted text-center py-2">
+            No results to show
           </div>
+          <table v-else class="table table-hover mb-0">
+            <thead>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>IBAN</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr
+                v-for="sender in senderIbans"
+                :key="sender.iban"
+                @click="selectSender(sender)"
+                :class="{ 'table-active': sender.iban === fromIban }"
+                style="cursor: pointer;"
+            >
+              <td>{{ sender.fullName }}</td>
+              <td>{{ sender.accountType }}</td>
+              <td>{{ sender.iban }}</td>
+            </tr>
+            </tbody>
+          </table>
         </div>
 
         <div class="mb-3">
-          <label for="destinationIban" class="form-label">To Account (IBAN)</label>
-          <div class="input-group">
-            <span class="input-group-text"><i class="bi bi-box-arrow-right"></i></span>
-            <input
-              v-model="destinationIban"
-              id="destinationIban"
-              type="text"
-              class="form-control"
-              placeholder="NLxxBANKxxxx..."
-              required
-            />
-          </div>
+          <label class="form-label">From IBAN</label>
+          <input v-model="fromIban" type="text" class="form-control" readonly />
         </div>
 
-        <div class="mb-4">
-          <label for="amount" class="form-label">Amount (€)</label>
-          <div class="input-group">
-            <span class="input-group-text"><i class="bi bi-currency-euro"></i></span>
-            <input
-              v-model.number="amount"
-              id="amount"
-              type="number"
-              class="form-control"
-              placeholder="0.00"
-              step="0.01"
-              min="0.01"
-              required
-            />
-          </div>
+        <!-- RECIPIENT SEARCH -->
+        <div class="mb-3">
+          <label class="form-label">Search Recipient (min 2 letters)</label>
+          <input v-model="recipientQuery" type="text" class="form-control" placeholder="Start typing name..." />
         </div>
 
-        <button type="submit" class="btn btn-success w-100 fw-semibold shadow-sm">
-          Transfer Now
+        <div class="search-results-box mb-3">
+          <div v-if="recipientQuery.length < 2" class="text-muted text-center py-2">
+            No results to show
+          </div>
+          <table v-else class="table table-hover mb-0">
+            <thead>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>IBAN</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr
+                v-for="recipient in recipientIbans"
+                :key="recipient.iban"
+                @click="selectRecipient(recipient)"
+                :class="{ 'table-active': recipient.iban === toIban }"
+                style="cursor: pointer;"
+            >
+              <td>{{ recipient.fullName }}</td>
+              <td>{{ recipient.accountType }}</td>
+              <td>{{ recipient.iban }}</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">To IBAN</label>
+          <input v-model="toIban" type="text" class="form-control" readonly />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Amount (&euro;)</label>
+          <input v-model.number="amount" type="number" min="0.01" step="0.01" class="form-control" required />
+        </div>
+
+        <button type="submit" class="btn w-100 text-white" style="background: linear-gradient(to right, #93FB9D, #09C7FB);">
+          Submit Transfer
         </button>
 
-        <div v-if="successMessage" class="alert alert-success mt-4" role="alert">
-          {{ successMessage }}
-        </div>
-        <div v-if="errorMessage" class="alert alert-danger mt-4" role="alert">
-          {{ errorMessage }}
-        </div>
+        <p v-if="errorMessage" class="text-danger mt-2 text-center">{{ errorMessage }}</p>
+        <p v-if="successMessage" class="text-success mt-2 text-center">{{ successMessage }}</p>
       </form>
     </div>
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue'
-import api from '@/api/api'
-import { useAuthStore } from '@/stores/authstore'
+<script>
+import api from '@/api/api';
+import { useAuthStore } from '@/stores/authstore';
 
-const sourceIban = ref('')
-const destinationIban = ref('')
-const amount = ref(0)
-const successMessage = ref('')
-const errorMessage = ref('')
-
-function getUserEmail() {
-  const authStore = useAuthStore()
-  const token = authStore.token
-  if (!token) return null
-
-  try {
-    const payload = JSON.parse(atob(token.split('.')[1]))
-    return payload.sub
-  } catch (e) {
-    console.error('Failed to decode token:', e)
-    return null
+export default {
+  name: 'TransactionForm',
+  data() {
+    return {
+      fromQuery: '',
+      recipientQuery: '',
+      senderIbans: [],
+      recipientIbans: [],
+      fromIban: '',
+      toIban: '',
+      amount: null,
+      errorMessage: '',
+      successMessage: '',
+      debounceTimeout: null,
+    };
+  },
+  computed: {
+    userEmail() {
+      const tokenPayload = JSON.parse(atob(useAuthStore().token.split('.')[1]));
+      return tokenPayload.sub;
+    }
+  },
+  methods: {
+    async fetchSenderIbans() {
+      if (this.fromQuery.length < 2) {
+        this.senderIbans = [];
+        return;
+      }
+      try {
+        const res = await api.post('/customer/search', {
+          query: this.fromQuery
+        });
+        this.senderIbans = res.data;
+      } catch (err) {
+        this.senderIbans = [];
+        this.errorMessage = 'Error searching sender accounts.';
+      }
+    },
+    async fetchRecipientIbans() {
+      if (this.recipientQuery.length < 2) {
+        this.recipientIbans = [];
+        return;
+      }
+      try {
+        const res = await api.post('/customer/search', {
+          query: this.recipientQuery
+        });
+        this.recipientIbans = res.data;
+      } catch (err) {
+        this.recipientIbans = [];
+        this.errorMessage = 'Error searching recipients.';
+      }
+    },
+    selectSender(sender) {
+      this.fromIban = sender.iban;
+    },
+    selectRecipient(recipient) {
+      this.toIban = recipient.iban;
+    },
+    async submitTransfer() {
+      this.errorMessage = '';
+      this.successMessage = '';
+      if (!this.fromIban || !this.toIban || !this.amount || this.amount <= 0) {
+        this.errorMessage = 'All fields are required and amount must be greater than 0';
+        return;
+      }
+      try {
+        const payload = {
+          fromAccountIban: this.fromIban,
+          toAccountIban: this.toIban,
+          amount: this.amount,
+          initiatorEmail: this.userEmail,
+          accountType: 'CHECKING'
+        };
+        await api.post('/employee/transfer', payload);
+        this.successMessage = 'Transfer successful!';
+        this.fromQuery = '';
+        this.recipientQuery = '';
+        this.senderIbans = [];
+        this.recipientIbans = [];
+        this.fromIban = '';
+        this.toIban = '';
+        this.amount = null;
+      } catch (err) {
+        this.errorMessage = err.response?.data.message || 'Transfer failed. Please try again.';
+      }
+    }
+  },
+  watch: {
+    fromQuery(newVal) {
+      clearTimeout(this.debounceTimeout);
+      this.debounceTimeout = setTimeout(() => {
+        this.fetchSenderIbans();
+      }, 300);
+    },
+    recipientQuery(newVal) {
+      clearTimeout(this.debounceTimeout);
+      this.debounceTimeout = setTimeout(() => {
+        this.fetchRecipientIbans();
+      }, 300);
+    }
   }
-}
-
-async function transferFunds() {
-  try {
-    const email = getUserEmail()
-
-    await api.post('/employee/transfer', {
-      fromAccountIban: sourceIban.value,
-      toAccountIban: destinationIban.value,
-      amount: amount.value,
-      initiatorEmail: email,
-      accountType: 'CHECKING'
-    })
-
-    successMessage.value = 'Transfer completed successfully.'
-    errorMessage.value = ''
-    sourceIban.value = ''
-    destinationIban.value = ''
-    amount.value = 0
-  } catch (err) {
-    successMessage.value = ''
-    errorMessage.value =
-      err.response?.data?.message || 'Transfer failed. Please check the IBANs and balance.'
-    console.error('Transfer error:', err)
-  }
-}
+};
 </script>
 
 <style scoped>
-.transfer-page {
-  padding: 20px;
+.search-results-box {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
-.transfer-card {
-  width: 100%;
-  max-width: 500px;
-  border-radius: 1rem;
-  background-color: #ffffff;
-}
-.logo-img {
-  max-width: 120px;
-}
-.input-group-text {
-  background-color: #e6f9f1;
-  border-right: 0;
-}
-.form-control {
-  border-left: 0;
+.search-results-box table {
+  margin: 0;
 }
 </style>

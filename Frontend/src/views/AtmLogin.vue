@@ -19,6 +19,15 @@
         </button>
 
         <p v-if="errorMessages" class="text-danger mt-2">{{ errorMessages }}</p>
+        <div class="mt-3 text-center">
+          <button
+            type="button"
+            class="btn btn-outline-primary"
+            @click="goToLogin"
+          >
+            Go To Login
+          </button>
+        </div>
       </form>
     </div>
   </div>
@@ -76,6 +85,10 @@ export default {
     },
   },
 };
+
+goToAtm() {
+      this.router.push("/login");
+    }
 </script>
 
 <style scoped>

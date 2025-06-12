@@ -85,7 +85,7 @@ export default {
         console.error("Login failed:", error);
       }
     },
-    goToAtm() {
+    goToLogin() {
       this.router.push("/login");
     },
   },

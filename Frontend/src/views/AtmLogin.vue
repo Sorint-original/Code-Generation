@@ -54,7 +54,11 @@ export default {
     this.router = useRouter();
   },
 
+
   methods: {
+    goToAtm() {
+      this.router.push("/login");
+    },
     async login() {
       try {
         const response = await api.post("/login", {
@@ -84,11 +88,10 @@ export default {
       }
     },
   },
+
 };
 
-goToAtm() {
-      this.router.push("/login");
-    }
+
 </script>
 
 <style scoped>

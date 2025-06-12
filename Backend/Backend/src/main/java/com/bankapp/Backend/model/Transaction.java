@@ -11,7 +11,7 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Who is sending the money
+    // nullable
     @ManyToOne(optional = true)
     @JoinColumn(name = "from_account_id", nullable = true)
     private BankAccount fromAccount;

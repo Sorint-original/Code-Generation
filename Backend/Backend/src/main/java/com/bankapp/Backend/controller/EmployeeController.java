@@ -1,19 +1,16 @@
 package com.bankapp.Backend.controller;
 
 import com.bankapp.Backend.DTO.*;
-import com.bankapp.Backend.exception.ResourceNotFoundException;
 import com.bankapp.Backend.exception.UserNotFoundException;
 import com.bankapp.Backend.model.BankAccount;
 import com.bankapp.Backend.model.CustomerStatus;
 import com.bankapp.Backend.model.Role;
-import com.bankapp.Backend.model.Transaction;
 import com.bankapp.Backend.model.User;
 import com.bankapp.Backend.model.*;
 import com.bankapp.Backend.service.BankAccountService;
 import com.bankapp.Backend.service.EmployeeService;
 import com.bankapp.Backend.service.TransactionService;
 import com.bankapp.Backend.service.UserService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -79,7 +76,7 @@ public class EmployeeController {
     }
 
     @PostMapping("/change-limit")
-    public ResponseEntity<ChangeDailyLimitResponse> changeDailyLimit(@RequestBody ChangeBankAcountsRequest request) {
+    public ResponseEntity<ChangeDailyLimitResponse> changeDailyLimit(@RequestBody ChangeBankAcountLimitRequest request) {
         try {
             BankAccount bankAccount = bankAccountService.GetBankAccount(request.getIban());
             bankAccountService.ChangeBankAccountLimits(bankAccount, request.getDailyLimit(), request.getAbsoluteLimit());

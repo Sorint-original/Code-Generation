@@ -84,8 +84,9 @@ async function confirm() {
     } else {
       throw new Error('No transaction type selected.')
     }
-    // Show success message
-    successMessage.value = response.data || 'Withdraw successful!'
+    await fetchAccounts()
+    selectedAccount.value = accounts.value.find(acc => acc.iban === payload.iban)
+    successMessage.value = response.data || 'Transaction successful!'
   } catch (err) {
     alert(err.response?.data || 'Transaction failed. Please try again.')
   } finally {

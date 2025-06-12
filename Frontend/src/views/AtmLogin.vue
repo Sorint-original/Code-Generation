@@ -56,9 +56,7 @@ export default {
 
 
   methods: {
-    goToAtm() {
-      this.router.push("/login");
-    },
+    
     async login() {
       try {
         const response = await api.post("/login", {
@@ -86,6 +84,9 @@ export default {
 
         console.error("Login failed:", error);
       }
+    },
+    goToAtm() {
+      this.router.push("/login");
     },
   },
 

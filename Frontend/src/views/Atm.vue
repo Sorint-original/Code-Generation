@@ -54,7 +54,6 @@ function backToSelection() {
   showButtons.value = true
   withDrawButton.value = false
   depositButton.value = false
-  selectedAccount.value = null
   amount.value = ''
   loading.value = false
   successMessage.value = ''
@@ -120,6 +119,11 @@ function logout() {
     <button class="btn btn-danger px-4 py-2" @click="logout">
       Logout
     </button>
+  </div>
+  <div v-if="selectedAccount && showButtons" class="text-center mb-4">
+    <label class="balance-label">
+      Balance: {{ selectedAccount.amount }}
+    </label>
   </div>
 
   <template v-if="showAccounts">
@@ -232,4 +236,10 @@ html, body, #app {
 .screen {
   padding: 2rem;
 }
+
+.balance-label {
+  color: #fff;
+  font-size: 3rem;
+}
+
 </style>

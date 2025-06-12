@@ -75,11 +75,11 @@
               : 'If you believe this is a mistake, please contact customer support.'
           }}
         </p>
-      </div>
-      <div class="text-center mb-4">
-        <button class="btn btn-danger px-4 py-2" @click="logout">
-          Logout
-        </button>
+        <div class="text-center mb-4">
+          <button class="btn btn-danger px-4 py-2" @click="logout">
+            Logout
+          </button>
+        </div>
       </div>
     </div>
 

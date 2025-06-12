@@ -39,11 +39,11 @@
           <AllAccounts />
         </div>
 
-        <div v-if="activePage === 'transferfunds'">
+        <div v-else-if="activePage === 'transferfunds'">
           <TransferFunds />
         </div>
         
-        <div v-if="activePage === 'unapproved'">
+        <div v-else-if="activePage === 'unapproved'">
           <ApproveCustomers />
         </div>
 

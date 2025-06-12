@@ -32,11 +32,9 @@ public interface BankAccountRepository extends JpaRepository<BankAccount, Long> 
 
     Optional<BankAccount> findByUserId(Long userId);
 
-    @Query("SELECT b FROM BankAccount b")
-    List<BankAccount> findAllBankAccounts();
+    List<BankAccount> findAll();
 
-    @Query("SELECT b FROM BankAccount b WHERE b.user.id = :userId")
-    List<BankAccount> findBankAccountsByUserId(@Param("userId") Long userId);
+    List<BankAccount> findAllByUser_Id(Long userId);
 
     @Modifying
     @Transactional

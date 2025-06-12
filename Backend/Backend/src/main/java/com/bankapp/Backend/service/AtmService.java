@@ -76,8 +76,8 @@ public class AtmService {
         Transaction txn = new Transaction();
         txn.setAmount(request.getAmount());
         txn.setDate(LocalDateTime.now());
-        txn.setFromAccount(account);
-        txn.setToAccount(null);
+        txn.setFromAccount(null);
+        txn.setToAccount(account);
         txn.setInitiatingUser(user);
         transactionRepository.save(txn);
 

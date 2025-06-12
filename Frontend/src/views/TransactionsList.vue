@@ -95,8 +95,8 @@
       <tbody>
         <tr v-for="transaction in filteredTransactions" :key="transaction.id">
           <td>{{ formatDate(transaction.date) }}</td>
-          <td>{{ transaction.fromAccount.iban }}</td>
-          <td>{{ transaction.toAccount.iban }}</td>
+          <td>{{ transaction.fromAccount?.iban || 'ATM' }}</td>
+          <td>{{ transaction.toAccount?.iban || 'ATM' }}</td>
           <td :class="{'text-danger': transaction.amount < 0, 'text-success': transaction.amount > 0}">
             {{ formatCurrency(transaction.amount) }}
           </td>

@@ -99,7 +99,7 @@ public class TransactionService {
                     + " in your bank account.");
         }
 
-        if (amount.compareTo(from.getAbsoluteTransferLimit()) < 0) {
+        if (amount.compareTo(from.getAbsoluteTransferLimit()) > 0) {
             throw new CustomerTransactionException("Transfer must exceed absolute transfer limit.");
         }
 

@@ -51,11 +51,11 @@ public class BankAccountService {
 
 
     public List<BankAccount> getAllBankAccounts() {
-        return bankAccountRepository.findAllBankAccounts();
+        return bankAccountRepository.findAll();
     }
 
     public List<BankAccount> getBankAccountsByUserId(Long userId) {
-        return bankAccountRepository.findBankAccountsByUserId(userId);
+        return bankAccountRepository.findAllByUser_Id(userId);
     }
 
     public void updateAccountStatus(String iban, AccountStatus status) {

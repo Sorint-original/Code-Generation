@@ -145,11 +145,15 @@ public class DataSeeder implements ApplicationRunner {
             Transaction t5 = new Transaction(bankAccount1, bankAccount2, new BigDecimal("300.00"), bankAccount1.getUser());
             t5.setDate(LocalDateTime.of(2025, 5, 23, 9, 33));
 
+            Transaction t6 = new Transaction(bankAccount1, null, new BigDecimal("300.00"), bankAccount1.getUser());
+            t6.setDate(LocalDateTime.of(2025, 5, 23, 9, 33));
+
             transactionRepository.save(t1);
             transactionRepository.save(t2);
             transactionRepository.save(t3);
             transactionRepository.save(t4);
             transactionRepository.save(t5);
+            transactionRepository.save(t6);
 
             System.out.println("Seeded test users!");
         }

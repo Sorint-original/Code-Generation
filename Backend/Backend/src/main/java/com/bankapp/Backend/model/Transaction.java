@@ -17,8 +17,8 @@ public class Transaction {
     private BankAccount fromAccount;
 
     // Who is receiving the money
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "to_account_id")
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "to_account_id", nullable = true)
     private BankAccount toAccount;
 
     @Column(nullable = false)

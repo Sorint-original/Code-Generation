@@ -127,20 +127,6 @@ const closeAccount = async (iban) => {
 
 onMounted(fetchAccounts)
 
-const showLimitModal = ref(false)
-const selectedAccount = ref(null)
-const absoluteLimit = ref('')
-
-
-const closeLimitModal = () => {
-  showLimitModal.value = false
-  selectedAccount.value = null
-  absoluteLimit.value = ''
-};
-
-
-
-
 const openLimitModal = (account) => {
   form.value.iban = account.iban;
   form.value.dailyLimit = account.dailyTransferLimit;

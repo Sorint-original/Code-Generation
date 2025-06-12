@@ -46,30 +46,32 @@ public class BankAccountServiceTest {
     @Test
     void getAllBankAccounts_ShouldReturnAccounts() {
         List<BankAccount> mockAccounts = List.of(new BankAccount(), new BankAccount());
-        when(bankAccountRepository.findAllBankAccounts()).thenReturn(mockAccounts);
+        when(bankAccountRepository.findAll()).thenReturn(mockAccounts);
 
         List<BankAccount> result = bankAccountService.getAllBankAccounts();
 
         assertEquals(2, result.size());
-        verify(bankAccountRepository, times(1)).findAllBankAccounts();
+        verify(bankAccountRepository, times(1)).findAll();
     }
 
     @Test
     void getBankAccountsByUserId_ShouldReturnUserAccounts() {
         Long userId = 1L;
         List<BankAccount> mockAccounts = List.of(new BankAccount());
-        when(bankAccountRepository.findBankAccountsByUserId(userId)).thenReturn(mockAccounts);
+        when(bankAccountRepository.findAllByUser_Id(userId)).thenReturn(mockAccounts);
 
         List<BankAccount> result = bankAccountService.getBankAccountsByUserId(userId);
 
         assertEquals(1, result.size());
-        verify(bankAccountRepository).findBankAccountsByUserId(userId);
+        verify(bankAccountRepository).findAllByUser_Id(userId);
     }
 
     @Test
     void updateAccountStatus_ShouldCallRepository() {
         String iban = "NL91ABNA0417164300";
         AccountStatus status = AccountStatus.BLOCKED;
+
+        when(bankAccountRepository.existsByIban(iban)).thenReturn(true);
 
         bankAccountService.updateAccountStatus(iban, status);
 

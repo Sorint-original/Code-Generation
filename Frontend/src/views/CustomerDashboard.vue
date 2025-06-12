@@ -76,6 +76,11 @@
           }}
         </p>
       </div>
+      <div class="text-center mb-4">
+        <button class="btn btn-danger px-4 py-2" @click="logout">
+          Logout
+        </button>
+      </div>
     </div>
 
     <!-- ⏳ Loading -->
@@ -132,6 +137,11 @@ export default {
     this.fetchDashboardData();
   },
 };
+
+function logout() {
+  authStore.logout()
+  router.push('/atm/login')
+}
 </script>
 
 <style scoped>

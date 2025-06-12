@@ -237,4 +237,9 @@ html, body, #app {
 .screen {
   padding: 2rem;
 }
+
+.balance-label {
+  color: #fff;
+  font-size: 3rem;
+}
 </style>

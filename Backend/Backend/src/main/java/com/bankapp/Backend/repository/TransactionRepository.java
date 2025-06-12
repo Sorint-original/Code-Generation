@@ -21,12 +21,16 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     List<Transaction> findAllTransactions();
 
     // Query that fetches all transactions a customer was part of (based on fromAccount, toAccount and initiatingUser)
-    @Query("SELECT t FROM Transaction t WHERE " +
-            "t.fromAccount.user.id = :userId OR " +
-            "t.toAccount.user.id = :userId OR " +
-            "t.initiatingUser.id = :userId " +
-            "ORDER BY t.date DESC")
+    @Query("""
+    SELECT t FROM Transaction t
+    WHERE 
+        (t.fromAccount IS NOT NULL AND t.fromAccount.user.id = :userId) OR
+        (t.toAccount IS NOT NULL AND t.toAccount.user.id = :userId) OR
+        t.initiatingUser.id = :userId
+    ORDER BY t.date DESC
+    """)
     List<Transaction> findAllUserRelatedTransactions(@Param("userId") Long userId);
+
 
 
 }
